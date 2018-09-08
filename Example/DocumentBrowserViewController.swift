@@ -50,13 +50,13 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didRequestDocumentCreationWithHandler importHandler: @escaping (URL?, UIDocumentBrowserViewController.ImportMode) -> Void) {
         let document = File(text: "Example file contents")
-        let fileName = [document.uuid, "boot"].joined(separator: ".")
+        let fileName = [document.uuid, "txt"].joined(separator: ".")
         
         // Set the URL for the new document here. Optionally, you can present a template chooser before calling the importHandler.
         // Make sure the importHandler is always called, even if the user cancels the creation request.
         
         do {
-            let newDocumentURL = try Disk.store(document, to: .documents, as: fileName)
+            let newDocumentURL = try Disk.store(document, to: .caches, as: fileName)
             importHandler(newDocumentURL, .move)
         } catch {
             importHandler(nil, .none)
