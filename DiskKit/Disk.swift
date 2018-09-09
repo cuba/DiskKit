@@ -81,7 +81,7 @@ public class Disk {
      */
     public static func diskData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) throws -> DiskData? {
         guard let data = fileData(withName: fileName, in: directory, subfolder: subfolder) else { return nil }
-        return DiskData(data: data, fileName: fileName)
+        return DiskData(data: data, name: fileName)
     }
     
     /**
@@ -94,7 +94,7 @@ public class Disk {
         for url in urls {
             let fileName = url.lastPathComponent
             guard let data = self.fileData(at: url) else { continue }
-            diskDatas.append(DiskData(data: data, fileName: fileName))
+            diskDatas.append(DiskData(data: data, name: fileName))
         }
         
         return diskDatas

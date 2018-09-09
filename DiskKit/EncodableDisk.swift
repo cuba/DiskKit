@@ -30,7 +30,7 @@ public class EncodableDisk {
      * @fileName: what to name the file where the struct data will be stored
      */
     @discardableResult public static func store<T: Encodable>(_ file: T, to directory: Disk.Directory, as fileName: String) throws -> URL {
-        let diskData = try DiskData(file: file, fileName: fileName)
+        let diskData = try DiskData(file: file, name: fileName)
         return try Disk.save(diskData, to: directory)
     }
     
@@ -66,7 +66,7 @@ public class EncodableDisk {
      * @fileName: what to name the file where the struct data will be stored
      */
     @discardableResult public static func store<T: DiskEncodable>(_ file: T, to directory: Disk.Directory, as fileName: String) throws -> URL {
-        let diskData = try DiskData(file: file, fileName: fileName)
+        let diskData = try DiskData(file: file, name: fileName)
         return try Disk.save(diskData, to: directory)
     }
     

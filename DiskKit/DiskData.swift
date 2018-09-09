@@ -12,8 +12,8 @@ public struct DiskData {
     let fileName: String
     let data: Data
     
-    init(data: Data, fileName: String) {
-        self.fileName = fileName
+    init(data: Data, name: String) {
+        self.fileName = name
         self.data = data
     }
     
@@ -21,19 +21,19 @@ public struct DiskData {
      * Encode the given Encodable file
      * @file: the encodable struct to store
      */
-    public init<T: Encodable>(file: T, fileName: String) throws {
+    public init<T: Encodable>(file: T, name: String) throws {
         let encoder = JSONEncoder()
         let data = try encoder.encode(file)
-        self.init(data: data, fileName: fileName)
+        self.init(data: data, name: name)
     }
     
     /**
      * Encode the specified DiskEncodable file
      * @file: the encodable struct to store
      */
-    public init<T: DiskEncodable>(file: T, fileName: String) throws {
+    public init<T: DiskEncodable>(file: T, name: String) throws {
         let data = try file.encode()
-        self.init(data: data, fileName: fileName)
+        self.init(data: data, name: name)
     }
     
     /**
