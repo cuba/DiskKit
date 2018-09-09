@@ -69,15 +69,24 @@ public class Disk {
     
     // MARK: - DiskData
     
+    /**
+     * Save the disk data to the directory specified
+     */
     public static func save(_ diskData: DiskData, to directory: Directory, subfolder: Folder? = nil) throws -> URL {
         return try store(fileData: diskData.data, withFileName: diskData.fileName, to: directory, subfolder: subfolder)
     }
-    
+
+    /**
+     * Retrieve the disk data in the directory specified with the given file name
+     */
     public static func diskData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) throws -> DiskData? {
         guard let data = fileData(withName: fileName, in: directory, subfolder: subfolder) else { return nil }
         return DiskData(data: data, fileName: fileName)
     }
     
+    /**
+     * Retrieve all disk data at specified directory
+     */
     public static func diskDatas(in directory: Directory, subfolder: Folder? = nil) throws -> [DiskData] {
         let urls = try fileUrls(in: directory, subfolder: subfolder)
         var diskDatas: [DiskData] = []
