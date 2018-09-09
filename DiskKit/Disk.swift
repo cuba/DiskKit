@@ -20,16 +20,9 @@ public enum ReadError: LocalizedError {
     case loadFailure
 }
 
-public protocol DiskEncodable {
-    func encode() throws -> Data
-}
-
-public protocol DiskDecodable {
-    init(_ data: Data) throws
-}
-
-public protocol DiskCodable: DiskEncodable, DiskDecodable{
-    
+public protocol DiskPackage {
+    init(files: [String: DiskData])
+    func encode() throws -> [String: DiskData]
 }
 
 public class Disk {
@@ -62,112 +55,79 @@ public class Disk {
                 fatalError("Could not create URL for specified directory!")
             }
         }
-    }
-    
-    /**
-     * Store an encodable struct to the specified directory on disk
-     * @object: the encodable struct to store
-     * @directory: where to store the struct
-     * @fileName: what to name the file where the struct data will be stored
-     */
-    @discardableResult public static func store<T: DiskEncodable>(_ file: T, to directory: Directory, as fileName: String) throws -> URL {
-        let data = try file.encode()
-        return try store(fileData: data, withFileName: fileName, to: directory)
-    }
-    
-    /**
-     * Store an Encodable struct to the specified directory on disk
-     * @object: the encodable struct to store
-     * @directory: where to store the struct
-     * @fileName: what to name the file where the struct data will be stored
-     */
-    @discardableResult public static func store<T: Encodable>(_ file: T, to directory: Directory, as fileName: String) throws -> URL {
-        let encoder = JSONEncoder()
-        let data = try encoder.encode(file)
-        return try store(fileData: data, withFileName: fileName, to: directory)
-    }
-    
-    /**
-     * Retrieve and convert a struct from a file on disk
-     * @fileName: name of the file where struct data is stored
-     * @directory: directory where struct data is stored
-     * @type: struct type (i.e. Message.self)
-     * @Returns: decoded struct model(s) of data
-     */
-    public static func file<T: Decodable>(withName fileName: String, in directory: Directory) throws -> T? {
-        if let data = fileData(withName: fileName, in: directory) {
-            let decoder = JSONDecoder()
-            let file = try decoder.decode(T.self, from: data)
-            return file
-        } else {
-            return nil
+        
+        func baseUrl(withSubfolder subfolder: Folder? = nil) -> URL {
+            var url = baseUrl
+            
+            if let subfolder = subfolder {
+                url = url.appendingPathComponent(subfolder, isDirectory: true)
+            }
+            
+            return url
         }
     }
+    
+    // MARK: - DiskData
+    
+    public static func save(_ diskData: DiskData, to directory: Directory, subfolder: Folder? = nil) throws -> URL {
+        return try store(fileData: diskData.data, withFileName: diskData.fileName, to: directory, subfolder: subfolder)
+    }
+    
+    public static func diskData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) throws -> DiskData? {
+        guard let data = fileData(withName: fileName, in: directory, subfolder: subfolder) else { return nil }
+        return DiskData(data: data, fileName: fileName)
+    }
+    
+    public static func diskDatas(in directory: Directory, subfolder: Folder? = nil) throws -> [DiskData] {
+        let urls = try fileUrls(in: directory, subfolder: subfolder)
+        var diskDatas: [DiskData] = []
+        
+        for url in urls {
+            let fileName = url.lastPathComponent
+            guard let data = self.fileData(at: url) else { continue }
+            diskDatas.append(DiskData(data: data, fileName: fileName))
+        }
+        
+        return diskDatas
+    }
+    
+    // MARK: - Directory
     
     /**
      * Retrieve all files at specified directory
      */
-    public static func files<T: Decodable>(in directory: Directory) throws -> [T] {
-        let datas = try filesDatas(in: directory)
-        var files: [T] = []
-        
-        for data in datas {
-            let decoder = JSONDecoder()
-            guard let file = try? decoder.decode(T.self, from: data) else { continue }
-            files.append(file)
-        }
-        
-        return files
+    public static func filesDatas(in directory: Directory, subfolder: Folder? = nil) throws -> [Data] {
+        let urls = try fileUrls(in: directory, subfolder: subfolder)
+        return urls.compactMap({ self.fileData(at: $0) })
     }
     
     /**
-     * Retrieve all files at specified directory
+     * Stores a file in the directoy specified. Replaces any file with the same name.
      */
-    public static func files<T: DiskDecodable>(in directory: Directory) throws -> [T] {
-        let datas = try filesDatas(in: directory)
-        var files: [T] = []
-        
-        for data in datas {
-            guard let file = try? T(data) else { continue }
-            files.append(file)
-        }
-        
-        return files
+    @discardableResult public static func store(fileData data: Data, withFileName fileName: String, to directory: Directory, subfolder: Folder? = nil) throws -> URL {
+        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+        try store(fileData: data, to: url)
+        return url
     }
     
     /**
-     * Retrieve and convert a struct from a file on disk
-     * @fileName: name of the file where struct data is stored
-     * @directory: directory where struct data is stored
-     * @type: struct type (i.e. Message.self)
-     * @Returns: decoded struct model(s) of data
+     * Returns a file with the given file name in the specified directory.
      */
-    public static func file<T: DiskDecodable>(withName fileName: String, in directory: Directory) throws -> T? {
-        if let data = fileData(withName: fileName, in: directory) {
-            let model = try T(data)
-            return model
-        } else {
-            return nil
-        }
+    public static func fileData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> Data? {
+        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+        return fileData(at: url)
     }
     
-    /**
-     * Retrieve all files at specified directory
-     */
-    public static func filesDatas(in directory: Directory) throws -> [Data] {
-        let urls = try fileUrls(in: directory)
-        return urls.map({ self.fileData(at: $0)! })
-    }
-    
-    public static func getURL(forFileName fileName: String, in directory: Directory) -> URL {
-        return directory.baseUrl.appendingPathComponent(fileName, isDirectory: false)
+    public static func getURL(forFileName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> URL {
+        let url = directory.baseUrl(withSubfolder: subfolder)
+        return url.appendingPathComponent(fileName, isDirectory: false)
     }
     
     /**
      * Remove all files at specified directory
      */
-    public static func clear(_ directory: Directory) throws {
-        let url = directory.baseUrl
+    public static func clear(_ directory: Directory, subfolder: Folder? = nil) throws {
+        let url = directory.baseUrl(withSubfolder: subfolder)
         
         let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
         for fileUrl in contents {
@@ -178,46 +138,32 @@ public class Disk {
     /**
      * Retrieve all files at specified directory
      */
-    public static func fileUrls(in directory: Directory) throws -> [URL] {
-        let url = directory.baseUrl
+    public static func fileUrls(in directory: Directory, subfolder: Folder? = nil) throws -> [URL] {
+        let url = directory.baseUrl(withSubfolder: subfolder)
         let urls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [], options: [])
         return urls
     }
-
     
     /**
      * Remove specified file from specified directory
      */
-    public static func remove(fileName: String, from directory: Directory) {
-        let url = getURL(forFileName: fileName, in: directory)
+    public static func remove(fileName: String, from directory: Directory, subfolder: Folder? = nil) {
+        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
         removeFile(at: url)
     }
     
     /**
      * Returns BOOL indicating whether file exists at specified directory with specified file name
      */
-    public static func fileExists(withFileName fileName: String, in directory: Directory) -> Bool {
-        let url = getURL(forFileName: fileName, in: directory)
+    public static func fileExists(withFileName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> Bool {
+        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
         return FileManager.default.fileExists(atPath: url.path)
     }
     
     /**
-     * Stores a file in the directoy specified. Replaces any file with the same name.
+     * Creates a subfolder in the specified directory.  Does nothing if it already exists.
      */
-    @discardableResult public static func store(fileData data: Data, withFileName fileName: String, to directory: Directory) throws -> URL {
-        let url = getURL(forFileName: fileName, in: directory)
-        try store(fileData: data, to: url)
-        return url
-    }
-    
-    /**
-     * Returns BOOL indicating whether file exists at specified url
-     */
-    public static func fileExists(at url: URL) -> Bool {
-        return FileManager.default.fileExists(atPath: url.path)
-    }
-    
-    public static func create(subfolder: Folder, in directory: Directory) throws -> URL {
+    @discardableResult public static func create(subfolder: Folder, in directory: Directory) throws -> URL {
         let url = directory.baseUrl.appendingPathComponent(subfolder, isDirectory: true)
         var isDirectory: ObjCBool = false
         
@@ -228,12 +174,13 @@ public class Disk {
         return url
     }
     
+    // MARK - URL
+    
     /**
-     * Returns a file with the given file name in the specified directory.
+     * Returns BOOL indicating whether file exists at specified url
      */
-    public static func fileData(withName fileName: String, in directory: Directory) -> Data? {
-        let url = getURL(forFileName: fileName, in: directory)
-        return fileData(at: url)
+    public static func fileExists(at url: URL) -> Bool {
+        return FileManager.default.fileExists(atPath: url.path)
     }
     
     /**

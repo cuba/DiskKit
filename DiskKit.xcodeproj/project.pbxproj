@@ -12,6 +12,8 @@
 		DAD010A5214426350038E5A4 /* DiskKit.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD01097214426340038E5A4 /* DiskKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAD01100214427AB0038E5A4 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD010FF214427AB0038E5A4 /* Disk.swift */; };
 		DAE4834B2144486300C19A58 /* SearchPathDirectory+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4834A2144486300C19A58 /* SearchPathDirectory+Extensions.swift */; };
+		DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4839E21456C0800C19A58 /* EncodableDisk.swift */; };
+		DAE483A1214572C800C19A58 /* DiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE483A0214572C800C19A58 /* DiskData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,8 @@
 		DAD010A4214426350038E5A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAD010FF214427AB0038E5A4 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
 		DAE4834A2144486300C19A58 /* SearchPathDirectory+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchPathDirectory+Extensions.swift"; sourceTree = "<group>"; };
+		DAE4839E21456C0800C19A58 /* EncodableDisk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableDisk.swift; sourceTree = "<group>"; };
+		DAE483A0214572C800C19A58 /* DiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +116,8 @@
 			isa = PBXGroup;
 			children = (
 				DAD010FF214427AB0038E5A4 /* Disk.swift */,
+				DAE4839E21456C0800C19A58 /* EncodableDisk.swift */,
+				DAE483A0214572C800C19A58 /* DiskData.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -227,6 +233,8 @@
 			files = (
 				DAE4834B2144486300C19A58 /* SearchPathDirectory+Extensions.swift in Sources */,
 				DAD01100214427AB0038E5A4 /* Disk.swift in Sources */,
+				DAE483A1214572C800C19A58 /* DiskData.swift in Sources */,
+				DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

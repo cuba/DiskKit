@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import DiskKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {

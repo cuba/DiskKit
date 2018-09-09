@@ -49,6 +49,7 @@ public enum CellProvider {
 
 class MasterViewController: UITableViewController {
     var articles: [Article] = []
+    let subfolder: Folder = "examples"
     
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
@@ -62,7 +63,8 @@ class MasterViewController: UITableViewController {
         navigationItem.leftBarButtonItem = editButtonItem
         
         do {
-            articles = try Disk.files(in: .documents)
+            try Disk.create(subfolder: subfolder, in: .documents)
+            articles = try EncodableDisk.files(in: .documents)
         } catch let error {
             // TODO: Show error
             print(error.localizedDescription)
@@ -89,7 +91,7 @@ class MasterViewController: UITableViewController {
     
     @objc private func tappedRefreshButton() {
         do {
-            articles = try Disk.files(in: .documents)
+            articles = try EncodableDisk.files(in: .documents)
         } catch let error {
             // TODO: Show error
             print(error.localizedDescription)
@@ -150,7 +152,7 @@ extension MasterViewController: DetailViewControllerDelegate {
         
         do {
             article.isModified = false
-            let url = try Disk.store(article, to: .documents, as: article.fileName)
+            let url = try EncodableDisk.store(article, to: .documents, as: article.fileName)
             print(url)
         } catch let error {
             // TODO: Show error

@@ -1,0 +1,55 @@
+//
+//  DiskData.swift
+//  DiskKit
+//
+//  Created by Jacob Sikorski on 2018-09-09.
+//  Copyright © 2018 Jacob Sikorski. All rights reserved.
+//
+
+import Foundation
+
+public struct DiskData {
+    let fileName: String
+    let data: Data
+    
+    init(data: Data, fileName: String) {
+        self.fileName = fileName
+        self.data = data
+    }
+    
+    /**
+     * Encode the given Encodable file
+     * @file: the encodable struct to store
+     */
+    public init<T: Encodable>(file: T, fileName: String) throws {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(file)
+        self.init(data: data, fileName: fileName)
+    }
+    
+    /**
+     * Encode the specified DiskEncodable file
+     * @file: the encodable struct to store
+     */
+    public init<T: DiskEncodable>(file: T, fileName: String) throws {
+        let data = try file.encode()
+        self.init(data: data, fileName: fileName)
+    }
+    
+    /**
+     * Decode the data to the specified Decodable type
+     * @Returns: decoded struct model(s) of data
+     */
+    public func decode<T: Decodable>() throws -> T {
+        let decoder = JSONDecoder()
+        return try decoder.decode(T.self, from: data)
+    }
+    
+    /**
+     * Decode the data to the specified DiskDecodable type
+     * @Returns: decoded struct model(s) of data
+     */
+    public func decode<T: DiskDecodable>() throws -> T {
+        return try T(data)
+    }
+}
