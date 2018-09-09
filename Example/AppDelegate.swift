@@ -9,14 +9,29 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
 
     var window: UIWindow?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
         
+        let splitViewController = UISplitViewController()
+        let masterViewController = MasterViewController()
+        let detailViewController = DetailViewController()
+        detailViewController.delegate = masterViewController
+        
+        splitViewController.viewControllers = [
+            UINavigationController(rootViewController: masterViewController),
+            UINavigationController(rootViewController: detailViewController)
+        ]
+        
+        window = UIWindow(frame: UIScreen.main.bounds)
+        window?.rootViewController = splitViewController
+        window?.makeKeyAndVisible()
+        
+        masterViewController.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
+        splitViewController.delegate = self
         return true
     }
 
@@ -42,27 +57,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
-    func application(_ app: UIApplication, open inputURL: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
-        // Ensure the URL is a file URL
-        guard inputURL.isFileURL else { return false }
-                
-        // Reveal / import the document at the URL
-        guard let documentBrowserViewController = window?.rootViewController as? DocumentBrowserViewController else { return false }
+    // MARK: - Split view
 
-        documentBrowserViewController.revealDocument(at: inputURL, importIfNeeded: true) { (revealedDocumentURL, error) in
-            if let error = error {
-                // Handle the error appropriately
-                print("Failed to reveal the document at URL \(inputURL) with error: '\(error)'")
-                return
-            }
-            
-            // Present the Document View Controller for the revealed URL
-            documentBrowserViewController.presentDocument(at: revealedDocumentURL!)
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        guard let navigationController = secondaryViewController as? UINavigationController else { return false }
+        guard let detailController = navigationController.topViewController as? DetailViewController else { return false }
+        
+        if detailController.article == nil {
+            // Return true to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
+            return true
+        } else {
+            return false
         }
-
-        return true
     }
-
 
 }
 

@@ -8,6 +8,8 @@
 
 import Foundation
 
+public typealias Folder = String
+
 public enum WriteError: LocalizedError {
     case encodeFailure
     case storeFailure
@@ -18,38 +20,19 @@ public enum ReadError: LocalizedError {
     case loadFailure
 }
 
-public protocol Serializable {
-    init(_ data: Data) throws
+public protocol DiskEncodable {
     func encode() throws -> Data
 }
 
-public protocol StringSerializable: Serializable {
-    init(_ string: String) throws
-    func encode() throws -> String
+public protocol DiskDecodable {
+    init(_ data: Data) throws
 }
 
-extension StringSerializable {
-    public init(_ data: Data) throws {
-        guard let text = String(data: data, encoding: .utf8) else {
-            throw ReadError.decodeFailure
-        }
-        
-        try self.init(text)
-    }
+public protocol DiskCodable: DiskEncodable, DiskDecodable{
     
-    public func encode() throws -> Data {
-        let text: String = try self.encode()
-        
-        guard let data = text.data(using: .utf8) else {
-            throw WriteError.encodeFailure
-        }
-        
-        return data
-    }
 }
 
 public class Disk {
-    
     private init() { }
     
     public enum Directory {
@@ -87,8 +70,20 @@ public class Disk {
      * @directory: where to store the struct
      * @fileName: what to name the file where the struct data will be stored
      */
-    @discardableResult public static func store<T: Serializable>(_ object: T, to directory: Directory, as fileName: String) throws -> URL {
-        let data = try object.encode()
+    @discardableResult public static func store<T: DiskEncodable>(_ file: T, to directory: Directory, as fileName: String) throws -> URL {
+        let data = try file.encode()
+        return try store(fileData: data, withFileName: fileName, to: directory)
+    }
+    
+    /**
+     * Store an Encodable struct to the specified directory on disk
+     * @object: the encodable struct to store
+     * @directory: where to store the struct
+     * @fileName: what to name the file where the struct data will be stored
+     */
+    @discardableResult public static func store<T: Encodable>(_ file: T, to directory: Directory, as fileName: String) throws -> URL {
+        let encoder = JSONEncoder()
+        let data = try encoder.encode(file)
         return try store(fileData: data, withFileName: fileName, to: directory)
     }
     
@@ -99,31 +94,80 @@ public class Disk {
      * @type: struct type (i.e. Message.self)
      * @Returns: decoded struct model(s) of data
      */
-    public static func retrieve<T: Serializable>(withFileName fileName: String, from directory: Directory, as type: T.Type) throws -> T {
-        if let data = retrieve(fileWithName: fileName, in: directory) {
-            let model = try type.init(data)
-            return model
+    public static func file<T: Decodable>(withName fileName: String, in directory: Directory) throws -> T? {
+        if let data = fileData(withName: fileName, in: directory) {
+            let decoder = JSONDecoder()
+            let file = try decoder.decode(T.self, from: data)
+            return file
         } else {
-            throw ReadError.loadFailure
+            return nil
         }
     }
     
     /**
-     * Returns URL constructed from specified directory
+     * Retrieve all files at specified directory
      */
-    public static func getURL(for directory: Directory) -> URL {
-        return directory.baseUrl
+    public static func files<T: Decodable>(in directory: Directory) throws -> [T] {
+        let datas = try filesDatas(in: directory)
+        var files: [T] = []
+        
+        for data in datas {
+            let decoder = JSONDecoder()
+            guard let file = try? decoder.decode(T.self, from: data) else { continue }
+            files.append(file)
+        }
+        
+        return files
+    }
+    
+    /**
+     * Retrieve all files at specified directory
+     */
+    public static func files<T: DiskDecodable>(in directory: Directory) throws -> [T] {
+        let datas = try filesDatas(in: directory)
+        var files: [T] = []
+        
+        for data in datas {
+            guard let file = try? T(data) else { continue }
+            files.append(file)
+        }
+        
+        return files
+    }
+    
+    /**
+     * Retrieve and convert a struct from a file on disk
+     * @fileName: name of the file where struct data is stored
+     * @directory: directory where struct data is stored
+     * @type: struct type (i.e. Message.self)
+     * @Returns: decoded struct model(s) of data
+     */
+    public static func file<T: DiskDecodable>(withName fileName: String, in directory: Directory) throws -> T? {
+        if let data = fileData(withName: fileName, in: directory) {
+            let model = try T(data)
+            return model
+        } else {
+            return nil
+        }
+    }
+    
+    /**
+     * Retrieve all files at specified directory
+     */
+    public static func filesDatas(in directory: Directory) throws -> [Data] {
+        let urls = try fileUrls(in: directory)
+        return urls.map({ self.fileData(at: $0)! })
     }
     
     public static func getURL(forFileName fileName: String, in directory: Directory) -> URL {
-        return getURL(for: directory).appendingPathComponent(fileName, isDirectory: false)
+        return directory.baseUrl.appendingPathComponent(fileName, isDirectory: false)
     }
     
     /**
      * Remove all files at specified directory
      */
     public static func clear(_ directory: Directory) throws {
-        let url = getURL(for: directory)
+        let url = directory.baseUrl
         
         let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
         for fileUrl in contents {
@@ -134,9 +178,10 @@ public class Disk {
     /**
      * Retrieve all files at specified directory
      */
-    public static func files(in directory: Directory) throws -> [URL] {
-        let url = getURL(for: directory)
-        return try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
+    public static func fileUrls(in directory: Directory) throws -> [URL] {
+        let url = directory.baseUrl
+        let urls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [], options: [])
+        return urls
     }
 
     
@@ -172,12 +217,23 @@ public class Disk {
         return FileManager.default.fileExists(atPath: url.path)
     }
     
+    public static func create(subfolder: Folder, in directory: Directory) throws -> URL {
+        let url = directory.baseUrl.appendingPathComponent(subfolder, isDirectory: true)
+        var isDirectory: ObjCBool = false
+        
+        if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        }
+        
+        return url
+    }
+    
     /**
      * Returns a file with the given file name in the specified directory.
      */
-    public static func retrieve(fileWithName fileName: String, in directory: Directory) -> Data? {
+    public static func fileData(withName fileName: String, in directory: Directory) -> Data? {
         let url = getURL(forFileName: fileName, in: directory)
-        return retrieveFile(at: url)
+        return fileData(at: url)
     }
     
     /**
@@ -207,7 +263,7 @@ public class Disk {
     /**
      * Returns a file at the specified url.
      */
-    public static func retrieveFile(at url: URL) -> Data? {
+    public static func fileData(at url: URL) -> Data? {
         let data = FileManager.default.contents(atPath: url.path)
         return data
     }
