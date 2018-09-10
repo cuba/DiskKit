@@ -20,11 +20,6 @@ public enum ReadError: LocalizedError {
     case loadFailure
 }
 
-public protocol DiskPackage {
-    init(files: [String: DiskData])
-    func encode() throws -> [String: DiskData]
-}
-
 public class Disk {
     private init() { }
     
@@ -56,11 +51,15 @@ public class Disk {
             }
         }
         
-        func baseUrl(withSubfolder subfolder: Folder? = nil) -> URL {
+        public func makeUrl(path: String? = nil, fileName: String? = nil) -> URL {
             var url = baseUrl
             
-            if let subfolder = subfolder {
-                url = url.appendingPathComponent(subfolder, isDirectory: true)
+            if let path = path {
+                url = url.appendingPathComponent(path, isDirectory: true)
+            }
+            
+            if let fileName = fileName {
+                url = url.appendingPathComponent(fileName, isDirectory: false)
             }
             
             return url
@@ -72,23 +71,23 @@ public class Disk {
     /**
      * Save the disk data to the directory specified
      */
-    public static func save(_ diskData: DiskData, to directory: Directory, subfolder: Folder? = nil) throws -> URL {
-        return try store(fileData: diskData.data, withFileName: diskData.fileName, to: directory, subfolder: subfolder)
+    public static func save(_ diskData: DiskData, to directory: Directory, path: String? = nil) throws -> URL {
+        return try save(fileData: diskData.data, to: directory, fileName: diskData.fileName, path: path)
     }
 
     /**
      * Retrieve the disk data in the directory specified with the given file name
      */
-    public static func diskData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) throws -> DiskData? {
-        guard let data = fileData(withName: fileName, in: directory, subfolder: subfolder) else { return nil }
+    public static func file(withName fileName: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
+        guard let data = fileData(in: directory, fileName: fileName, path: path) else { return nil }
         return DiskData(data: data, name: fileName)
     }
     
     /**
      * Retrieve all disk data at specified directory
      */
-    public static func diskDatas(in directory: Directory, subfolder: Folder? = nil) throws -> [DiskData] {
-        let urls = try fileUrls(in: directory, subfolder: subfolder)
+    public static func files(in directory: Directory, path: String? = nil) throws -> [DiskData] {
+        let urls = try contents(of: directory, path: path)
         var diskDatas: [DiskData] = []
         
         for url in urls {
@@ -105,16 +104,16 @@ public class Disk {
     /**
      * Retrieve all files at specified directory
      */
-    public static func filesDatas(in directory: Directory, subfolder: Folder? = nil) throws -> [Data] {
-        let urls = try fileUrls(in: directory, subfolder: subfolder)
+    private static func filesDatas(in directory: Directory, path: String? = nil) throws -> [Data] {
+        let urls = try contents(of: directory, path: path)
         return urls.compactMap({ self.fileData(at: $0) })
     }
     
     /**
      * Stores a file in the directoy specified. Replaces any file with the same name.
      */
-    @discardableResult public static func store(fileData data: Data, withFileName fileName: String, to directory: Directory, subfolder: Folder? = nil) throws -> URL {
-        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+    @discardableResult private static func save(fileData data: Data, to directory: Directory, fileName: String, path: String? = nil) throws -> URL {
+        let url = directory.makeUrl(path: path, fileName: fileName)
         try store(fileData: data, to: url)
         return url
     }
@@ -122,33 +121,41 @@ public class Disk {
     /**
      * Returns a file with the given file name in the specified directory.
      */
-    public static func fileData(withName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> Data? {
-        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+    private static func fileData(in directory: Directory, fileName: String, path: String? = nil) -> Data? {
+        let url = directory.makeUrl(path: path, fileName: fileName)
         return fileData(at: url)
-    }
-    
-    public static func getURL(forFileName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> URL {
-        let url = directory.baseUrl(withSubfolder: subfolder)
-        return url.appendingPathComponent(fileName, isDirectory: false)
     }
     
     /**
      * Remove all files at specified directory
      */
-    public static func clear(_ directory: Directory, subfolder: Folder? = nil) throws {
-        let url = directory.baseUrl(withSubfolder: subfolder)
-        
+    @discardableResult public static func clear(_ directory: Directory, path: String? = nil) throws -> URL {
+        let url = directory.makeUrl(path: path)
         let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
+        
         for fileUrl in contents {
             try FileManager.default.removeItem(at: fileUrl)
+        }
+        
+        return url
+    }
+    
+    /**
+     * Remove all files at specified directory
+     */
+    public static func remove(_ directory: Directory, path: String) throws {
+        let url = try clear(directory, path: path)
+        
+        if !path.isEmpty {
+            try FileManager.default.removeItem(at: url)
         }
     }
     
     /**
      * Retrieve all files at specified directory
      */
-    public static func fileUrls(in directory: Directory, subfolder: Folder? = nil) throws -> [URL] {
-        let url = directory.baseUrl(withSubfolder: subfolder)
+    public static func contents(of directory: Directory, path: String? = nil) throws -> [URL] {
+        let url = directory.makeUrl(path: path)
         let urls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [], options: [])
         return urls
     }
@@ -156,28 +163,30 @@ public class Disk {
     /**
      * Remove specified file from specified directory
      */
-    public static func remove(fileName: String, from directory: Directory, subfolder: Folder? = nil) {
-        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+    public static func remove(fileName: String, from directory: Directory, path: String? = nil) {
+        let url = directory.makeUrl(path: path, fileName: fileName)
         removeFile(at: url)
     }
     
     /**
      * Returns BOOL indicating whether file exists at specified directory with specified file name
      */
-    public static func fileExists(withFileName fileName: String, in directory: Directory, subfolder: Folder? = nil) -> Bool {
-        let url = getURL(forFileName: fileName, in: directory, subfolder: subfolder)
+    public static func fileExists(in directory: Directory, withFileName fileName: String, path: String? = nil) -> Bool {
+        let url = directory.makeUrl(path: path, fileName: fileName)
         return FileManager.default.fileExists(atPath: url.path)
     }
     
     /**
      * Creates a subfolder in the specified directory.  Does nothing if it already exists.
      */
-    @discardableResult public static func create(subfolder: Folder, in directory: Directory) throws -> URL {
-        let url = directory.baseUrl.appendingPathComponent(subfolder, isDirectory: true)
+    @discardableResult public static func create(path: String, in directory: Directory) throws -> URL {
+        let url = directory.makeUrl(path: path)
         var isDirectory: ObjCBool = false
         
         if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+        } else if !isDirectory.boolValue {
+            // TODO: Throw path is not directory error
         }
         
         return url

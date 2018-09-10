@@ -63,8 +63,8 @@ class MasterViewController: UITableViewController {
         navigationItem.leftBarButtonItem = editButtonItem
         
         do {
-            try Disk.create(subfolder: subfolder, in: .documents)
-            articles = try EncodableDisk.files(in: .documents)
+            try Disk.create(path: subfolder, in: .documents)
+            articles = try EncodableDisk.files(in: .documents, path: subfolder)
         } catch let error {
             // TODO: Show error
             print(error.localizedDescription)
@@ -91,7 +91,7 @@ class MasterViewController: UITableViewController {
     
     @objc private func tappedRefreshButton() {
         do {
-            articles = try EncodableDisk.files(in: .documents)
+            articles = try EncodableDisk.files(in: .documents, path: subfolder)
         } catch let error {
             // TODO: Show error
             print(error.localizedDescription)
@@ -152,7 +152,7 @@ extension MasterViewController: DetailViewControllerDelegate {
         
         do {
             article.isModified = false
-            let url = try EncodableDisk.store(article, to: .documents, as: article.fileName)
+            let url = try EncodableDisk.store(article, to: .documents, as: article.fileName, path: subfolder)
             print(url)
         } catch let error {
             // TODO: Show error

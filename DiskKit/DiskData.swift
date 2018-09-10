@@ -53,3 +53,9 @@ public struct DiskData {
         return try T(data)
     }
 }
+
+extension DiskData: Equatable {
+    public static func == (lhs: DiskData, rhs: DiskData) -> Bool {
+        return lhs.fileName == rhs.fileName
+    }
+}
