@@ -64,6 +64,11 @@ public class Disk {
             
             return url
         }
+        
+        public func makeUrl(paths: [String], fileName: String? = nil) -> URL {
+            let path = paths.joined(separator: "/")
+            return makeUrl(path: path, fileName: fileName)
+        }
     }
     
     // MARK: - DiskData
@@ -156,8 +161,7 @@ public class Disk {
      */
     public static func contents(of directory: Directory, path: String? = nil) throws -> [URL] {
         let url = directory.makeUrl(path: path)
-        let urls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [], options: [])
-        return urls
+        return try self.contentsOfDirectory(at: url)
     }
     
     /**
@@ -181,6 +185,16 @@ public class Disk {
      */
     @discardableResult public static func create(path: String, in directory: Directory) throws -> URL {
         let url = directory.makeUrl(path: path)
+        try self.createDirectory(at: url)
+        return url
+    }
+    
+    // MARK - URL
+    
+    /**
+     * Creates a subfolder in the specified directory.  Does nothing if it already exists.
+     */
+    public static func createDirectory(at url: URL) throws {
         var isDirectory: ObjCBool = false
         
         if !FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
@@ -188,11 +202,15 @@ public class Disk {
         } else if !isDirectory.boolValue {
             // TODO: Throw path is not directory error
         }
-        
-        return url
     }
     
-    // MARK - URL
+    /**
+     * Retrieve all files at specified directory
+     */
+    public static func contentsOfDirectory(at url: URL) throws -> [URL] {
+        let urls = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: [], options: [])
+        return urls
+    }
     
     /**
      * Returns BOOL indicating whether file exists at specified url

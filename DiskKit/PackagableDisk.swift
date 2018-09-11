@@ -8,6 +8,10 @@
 
 import Foundation
 
+public enum PackageReadError: LocalizedError {
+    case fileNotFound
+}
+
 public class PackageMap {
     var files: [DiskData] = []
     
@@ -36,8 +40,24 @@ public class PackageMap {
         return try diskData.decode()
     }
     
+    public func file<T: Decodable>(_ name: String) throws -> T {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
+            throw PackageReadError.fileNotFound
+        }
+        
+        return try diskData.decode()
+    }
+    
     public func file<T: DiskDecodable>(_ name: String) throws -> T? {
         guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
+        return try diskData.decode()
+    }
+    
+    public func file<T: DiskDecodable>(_ name: String) throws -> T {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
+            throw PackageReadError.fileNotFound
+        }
+        
         return try diskData.decode()
     }
 }
@@ -55,14 +75,17 @@ public class PackagableDisk {
      * @directory: where to store the struct
      * @packageName: what to name the package where the folder will be stored
      */
-    public static func store(_ package: Package, in directory: Disk.Directory, withName packageName: String) throws -> URL {
-        let packageUrl = try Disk.create(path: packageName, in: directory)
+    public static func store(_ package: Package, to directory: Disk.Directory, withName packageName: String) throws -> URL {
+        let packageUrl = directory.makeUrl(path: packageName)
+        let resourcesUrl = packageUrl.appendingPathComponent("/Resources")
+        try Disk.createDirectory(at: resourcesUrl)
+        
         let map = PackageMap()
         try package.mapping(map: map)
         
         for file in map.files {
             let fileName = file.fileName
-            let url = packageUrl.appendingPathComponent(fileName)
+            let url = resourcesUrl.appendingPathComponent(fileName)
             try Disk.store(fileData: file.data, to: url)
         }
         
@@ -76,11 +99,12 @@ public class PackagableDisk {
      * @Returns: decoded package
      */
     public static func file<T: Package>(withName packageName: String, in directory: Disk.Directory) throws -> T? {
-        let fileUrls = try Disk.contents(of: directory, path: packageName)
+        let resourcesUrl = directory.makeUrl(paths: [packageName, "Resources"])
+        let fileUrls = try Disk.contentsOfDirectory(at: resourcesUrl)
         let map = PackageMap()
         
         for fileUrl in fileUrls {
-            guard let data = try Disk.fileData(at: fileUrl) else { continue }
+            guard let data = Disk.fileData(at: fileUrl) else { continue }
             let file = DiskData(data: data, name: fileUrl.lastPathComponent)
             map.add(file)
         }
@@ -89,6 +113,20 @@ public class PackagableDisk {
     }
     
     static func files<T: Package>(in directory: Disk.Directory) throws -> [T] {
-        return []
+        let fileUrls = try Disk.contents(of: directory)
+        let fileNames = fileUrls.map({ $0.lastPathComponent })
+        var files: [T] = []
+        
+        for fileName in fileNames {
+            do {
+                guard let file: T = try self.file(withName: fileName, in: directory) else { continue }
+                
+                files.append(file)
+            } catch {
+                // Handle this?
+            }
+        }
+        
+        return files
     }
 }

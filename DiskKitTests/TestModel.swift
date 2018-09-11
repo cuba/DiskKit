@@ -46,3 +46,30 @@ extension TestDiskCodable: Equatable {
         return lhs.id == rhs.id
     }
 }
+
+struct TestPackage: Package {
+    var codable: TestCodable
+    var diskCodable: TestDiskCodable
+    
+    init(codable: TestCodable, diskCodable: TestDiskCodable) {
+        self.codable = codable
+        self.diskCodable = diskCodable
+    }
+    
+    init(map: PackageMap) throws {
+        self.codable = try map.file("codable.json")
+        self.diskCodable = try map.file("disk_codable.json")
+    }
+    
+    func mapping(map: PackageMap) throws {
+        try map.add(codable, name: "codable.json")
+        try map.add(diskCodable, name: "disk_codable.json")
+    }
+}
+
+extension TestPackage: Equatable {
+    
+    public static func == (lhs: TestPackage, rhs: TestPackage) -> Bool {
+        return lhs.codable == rhs.codable && lhs.diskCodable == rhs.diskCodable
+    }
+}
