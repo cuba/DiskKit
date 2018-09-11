@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA1A8B4E214761B3005C3D05 /* TestModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B4D214761B3005C3D05 /* TestModel.swift */; };
+		DA1A8B5521477369005C3D05 /* EncodableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */; };
+		DA1A8B572147737D005C3D05 /* PackagableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */; };
+		DA1A8B5B214773BE005C3D05 /* DiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5A214773BE005C3D05 /* DiskTests.swift */; };
 		DAD0109E214426350038E5A4 /* DiskKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAD01094214426340038E5A4 /* DiskKit.framework */; };
-		DAD010A3214426350038E5A4 /* DiskKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD010A2214426350038E5A4 /* DiskKitTests.swift */; };
 		DAD010A5214426350038E5A4 /* DiskKit.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD01097214426340038E5A4 /* DiskKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAD01100214427AB0038E5A4 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD010FF214427AB0038E5A4 /* Disk.swift */; };
 		DAE4834B2144486300C19A58 /* SearchPathDirectory+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4834A2144486300C19A58 /* SearchPathDirectory+Extensions.swift */; };
@@ -28,11 +31,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DA1A8B4D214761B3005C3D05 /* TestModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModel.swift; sourceTree = "<group>"; };
+		DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableDiskTests.swift; sourceTree = "<group>"; };
+		DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagableDiskTests.swift; sourceTree = "<group>"; };
+		DA1A8B5A214773BE005C3D05 /* DiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskTests.swift; sourceTree = "<group>"; };
 		DAD01094214426340038E5A4 /* DiskKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DiskKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAD01097214426340038E5A4 /* DiskKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DiskKit.h; sourceTree = "<group>"; };
 		DAD01098214426350038E5A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAD0109D214426350038E5A4 /* DiskKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DiskKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAD010A2214426350038E5A4 /* DiskKitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskKitTests.swift; sourceTree = "<group>"; };
 		DAD010A4214426350038E5A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAD010FF214427AB0038E5A4 /* Disk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disk.swift; sourceTree = "<group>"; };
 		DAE4834A2144486300C19A58 /* SearchPathDirectory+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchPathDirectory+Extensions.swift"; sourceTree = "<group>"; };
@@ -91,7 +97,10 @@
 		DAD010A1214426350038E5A4 /* DiskKitTests */ = {
 			isa = PBXGroup;
 			children = (
-				DAD010A2214426350038E5A4 /* DiskKitTests.swift */,
+				DA1A8B5A214773BE005C3D05 /* DiskTests.swift */,
+				DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */,
+				DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */,
+				DA1A8B4D214761B3005C3D05 /* TestModel.swift */,
 				DAD010A4214426350038E5A4 /* Info.plist */,
 			);
 			path = DiskKitTests;
@@ -246,7 +255,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DAD010A3214426350038E5A4 /* DiskKitTests.swift in Sources */,
+				DA1A8B4E214761B3005C3D05 /* TestModel.swift in Sources */,
+				DA1A8B5521477369005C3D05 /* EncodableDiskTests.swift in Sources */,
+				DA1A8B5B214773BE005C3D05 /* DiskTests.swift in Sources */,
+				DA1A8B572147737D005C3D05 /* PackagableDiskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
