@@ -55,7 +55,7 @@ public class PackagableDisk {
      * @directory: where to store the struct
      * @packageName: what to name the package where the folder will be stored
      */
-    public static func save(_ package: Package, in directory: Disk.Directory, withName packageName: String) throws -> URL {
+    public static func store(_ package: Package, in directory: Disk.Directory, withName packageName: String) throws -> URL {
         let packageUrl = try Disk.create(path: packageName, in: directory)
         let map = PackageMap()
         try package.mapping(map: map)

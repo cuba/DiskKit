@@ -71,22 +71,22 @@ public class Disk {
     /**
      * Save the disk data to the directory specified
      */
-    public static func save(_ diskData: DiskData, to directory: Directory, path: String? = nil) throws -> URL {
-        return try save(fileData: diskData.data, to: directory, fileName: diskData.fileName, path: path)
+    public static func store(_ diskData: DiskData, to directory: Directory, path: String? = nil) throws -> URL {
+        return try store(fileData: diskData.data, to: directory, fileName: diskData.fileName, path: path)
     }
 
     /**
      * Retrieve the disk data in the directory specified with the given file name
      */
-    public static func file(withName fileName: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
-        guard let data = fileData(in: directory, fileName: fileName, path: path) else { return nil }
+    public static func diskData(withName fileName: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
+        guard let data = fileData(withName: fileName, in: directory, path: path) else { return nil }
         return DiskData(data: data, name: fileName)
     }
     
     /**
      * Retrieve all disk data at specified directory
      */
-    public static func files(in directory: Directory, path: String? = nil) throws -> [DiskData] {
+    public static func diskDataArray(in directory: Directory, path: String? = nil) throws -> [DiskData] {
         let urls = try contents(of: directory, path: path)
         var diskDatas: [DiskData] = []
         
@@ -102,17 +102,9 @@ public class Disk {
     // MARK: - Directory
     
     /**
-     * Retrieve all files at specified directory
-     */
-    private static func filesDatas(in directory: Directory, path: String? = nil) throws -> [Data] {
-        let urls = try contents(of: directory, path: path)
-        return urls.compactMap({ self.fileData(at: $0) })
-    }
-    
-    /**
      * Stores a file in the directoy specified. Replaces any file with the same name.
      */
-    @discardableResult private static func save(fileData data: Data, to directory: Directory, fileName: String, path: String? = nil) throws -> URL {
+    @discardableResult public static func store(fileData data: Data, to directory: Directory, fileName: String, path: String? = nil) throws -> URL {
         let url = directory.makeUrl(path: path, fileName: fileName)
         try store(fileData: data, to: url)
         return url
@@ -121,9 +113,17 @@ public class Disk {
     /**
      * Returns a file with the given file name in the specified directory.
      */
-    private static func fileData(in directory: Directory, fileName: String, path: String? = nil) -> Data? {
+    public static func fileData(withName fileName: String, in directory: Directory, path: String? = nil) -> Data? {
         let url = directory.makeUrl(path: path, fileName: fileName)
         return fileData(at: url)
+    }
+    
+    /**
+     * Retrieve all files at specified directory
+     */
+    public static func fileDataArray(in directory: Directory, path: String? = nil) throws -> [Data] {
+        let urls = try contents(of: directory, path: path)
+        return urls.compactMap({ self.fileData(at: $0) })
     }
     
     /**
