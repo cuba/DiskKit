@@ -67,7 +67,7 @@ public class EncodableDisk {
      */
     @discardableResult public static func store<T: DiskEncodable>(_ file: T, to directory: Disk.Directory, as fileName: String, path: String? = nil) throws -> URL {
         let diskData = try DiskData(file: file, name: fileName)
-        return try Disk.store(diskData, to: directory)
+        return try Disk.store(diskData, to: directory, path: path)
     }
     
     /**

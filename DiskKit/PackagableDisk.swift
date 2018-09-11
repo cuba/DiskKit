@@ -75,8 +75,8 @@ public class PackagableDisk {
      * @directory: where to store the struct
      * @packageName: what to name the package where the folder will be stored
      */
-    public static func store(_ package: Package, to directory: Disk.Directory, withName packageName: String) throws -> URL {
-        let packageUrl = directory.makeUrl(path: packageName)
+    public static func store(_ package: Package, to directory: Disk.Directory, withName packageName: String, path: String? = nil) throws -> URL {
+        let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
         let resourcesUrl = packageUrl.appendingPathComponent("/Resources")
         try Disk.createDirectory(at: resourcesUrl)
         
@@ -98,8 +98,8 @@ public class PackagableDisk {
      * @directory: directory where package data is stored
      * @Returns: decoded package
      */
-    public static func file<T: Package>(withName packageName: String, in directory: Disk.Directory) throws -> T? {
-        let resourcesUrl = directory.makeUrl(paths: [packageName, "Resources"])
+    public static func package<T: Package>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
+        let resourcesUrl = directory.makeUrl(paths: [path, packageName, "Resources"].compactMap({ $0 }))
         let fileUrls = try Disk.contentsOfDirectory(at: resourcesUrl)
         let map = PackageMap()
         
@@ -112,21 +112,21 @@ public class PackagableDisk {
         return try T(map: map)
     }
     
-    static func files<T: Package>(in directory: Disk.Directory) throws -> [T] {
-        let fileUrls = try Disk.contents(of: directory)
-        let fileNames = fileUrls.map({ $0.lastPathComponent })
-        var files: [T] = []
+    static func packages<T: Package>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
+        let packageUrls = try Disk.contents(of: directory, path: path)
+        let packageNames = packageUrls.map({ $0.lastPathComponent })
+        var packages: [T] = []
         
-        for fileName in fileNames {
+        for packageName in packageNames {
             do {
-                guard let file: T = try self.file(withName: fileName, in: directory) else { continue }
+                guard let file: T = try self.package(withName: packageName, in: directory, path: path) else { continue }
                 
-                files.append(file)
+                packages.append(file)
             } catch {
                 // Handle this?
             }
         }
         
-        return files
+        return packages
     }
 }

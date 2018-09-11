@@ -27,10 +27,11 @@ class EncodableDiskTests: XCTestCase {
         let testFile = TestCodable(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestCodable = try! EncodableDisk.file(withName: fileName, in: .documents) else {
+        guard let loadedFile: TestCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -44,12 +45,12 @@ class EncodableDiskTests: XCTestCase {
         let testFiles = [TestCodable(id: "ABC"), TestCodable(id: "123")]
         
         // When
-        
-        XCTAssertNoThrow(try EncodableDisk.store(testFiles[0], to: .documents, as: "example.json"))
-        XCTAssertNoThrow(try EncodableDisk.store(testFiles[1], to: .documents, as: "example_2.json"))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFiles[0], to: .documents, as: "example.json", path: "some_folder"))
+        XCTAssertNoThrow(try EncodableDisk.store(testFiles[1], to: .documents, as: "example_2.json", path: "some_folder"))
         
         // Then
-        guard let loadedFiles: [TestCodable] = try? EncodableDisk.files(in: .documents) else {
+        guard let loadedFiles: [TestCodable] = try? EncodableDisk.files(in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -65,10 +66,10 @@ class EncodableDiskTests: XCTestCase {
         let testFile = TestCodable(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json"))
-        
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "some_folder"))
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
     }
     
     func testGivenDiskCodableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
@@ -77,10 +78,11 @@ class EncodableDiskTests: XCTestCase {
         let testFile = TestDiskCodable(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents) else {
+        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -95,10 +97,11 @@ class EncodableDiskTests: XCTestCase {
         let testFile = TestDiskCodable(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents) else {
+        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -113,9 +116,10 @@ class EncodableDiskTests: XCTestCase {
         let testFile = TestDiskCodable(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json"))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "some_folder"))
         
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
     }
 }

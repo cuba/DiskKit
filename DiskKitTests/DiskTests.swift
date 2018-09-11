@@ -32,10 +32,11 @@ class DiskTests: XCTestCase {
         }
         
         // When
-        XCTAssertNoThrow(try Disk.store(diskData, to: .documents))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
         
         // Then
-        guard let loadedDiskData = try! Disk.diskData(withName: fileName, in: .documents) else {
+        guard let loadedDiskData = try! Disk.diskData(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -59,11 +60,12 @@ class DiskTests: XCTestCase {
         })
         
         // When
-        XCTAssertNoThrow(try Disk.store(diskDataArray[0], to: .documents))
-        XCTAssertNoThrow(try Disk.store(diskDataArray[1], to: .documents))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try Disk.store(diskDataArray[0], to: .documents, path: "some_folder"))
+        XCTAssertNoThrow(try Disk.store(diskDataArray[1], to: .documents, path: "some_folder"))
         
         // Then
-        guard let loadedDiskDataArray = try? Disk.diskDataArray(in: .documents) else {
+        guard let loadedDiskDataArray = try? Disk.diskDataArray(in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -89,9 +91,10 @@ class DiskTests: XCTestCase {
         }
         
         // When
-        XCTAssertNoThrow(try Disk.store(diskData, to: .documents))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
         
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
     }
 }
