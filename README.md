@@ -157,13 +157,13 @@ do {
 
 **Note:**
 You may provide additional information about your package type (and extension) in your applications Info.plist file.
-You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html)
+You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
 ### Using DiskData
 
 DiskData is a helper class that lets you parse your files after retrieving them. This is useful when you're not sure what kind of file you are expected to recieve.  It is also used inside packages as it may contain a variety of different file types.
 
-You can create DiskData files like this:
+**Creating DiskData files**
 
 ```swift
 let fileName = "example.json"
@@ -171,7 +171,7 @@ let testFile = TestCodable(id: "ABC")
 let diskData = try DiskData(file: testFile, name: fileName)
 ```
 
-DiskData supports both Codable and DiskCodable files
+`DiskData` supports both `Codable` and `DiskCodable` files.
 
 **Storing DiskData files:**
 
@@ -213,7 +213,7 @@ try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "som
 ```
 
 **Note:**
-You don't need to create subdirectories beforehand when storing Package. Packages themeselves create [Document Directories](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) when storing them and therefore has to create the full directory path.
+You don't need to create subdirectories beforehand when storing `Package` files. `Package` files create a [Document Directories](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) when storing them and therefore has to create the full directory path.
 
 ### Other useful functionality
 
