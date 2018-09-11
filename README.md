@@ -213,7 +213,7 @@ try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "som
 ```
 
 **Note:**
-You don't need to create subdirectories beforehand when storing `Package` files. `Package` files create a [Document Directories](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) when storing them and therefore has to create the full directory path.
+You don't need to create subdirectories beforehand when storing `Package` files. `Package` files create a [Document Package](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) directory structure and therefore has to create the full directory path to achieve this.
 
 ### Other useful functionality
 
