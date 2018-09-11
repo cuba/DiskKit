@@ -97,4 +97,9 @@ class DiskTests: XCTestCase {
         // Then
         XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
     }
+    
+    func testRemovingPathInDirectory() {
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try Disk.remove(path: "some_folder", in: .documents))
+    }
 }

@@ -148,7 +148,7 @@ public class Disk {
     /**
      * Remove all files at specified directory
      */
-    public static func remove(_ directory: Directory, path: String) throws {
+    public static func remove(path: String, in directory: Directory) throws {
         let url = try clear(directory, path: path)
         
         if !path.isEmpty {
