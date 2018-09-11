@@ -10,12 +10,14 @@ DiskKit
 - [Credits](#credits)
 - [License](#license)
 
+
 ## Features
 
-- [x] A wrapper around Alamofire
-- [x] Uses ObjectMapper for object deserialization
+- [x] Store any file type
 - [x] Easy integration
-- [x] Handles common http errors
+- [x] Suppports [Document Packages](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html#)
+- [x] Suppports [Codable](https://developer.apple.com/documentation/swift/codable) protocol
+
 
 ## Installation
 
@@ -37,6 +39,7 @@ github "cuba/DiskKit"
 ```
 
 Run `carthage update` to build the framework and drag the built `DiskKit.framework` into your Xcode project.
+
 
 ## Usage
 
@@ -75,6 +78,7 @@ struct TestDiskCodable: DiskCodable {
 
 DiskCodable gives you some extra flexability with the types of files you can store.
 
+
 ### Storing files
 
 Store a single file like this:
@@ -89,6 +93,7 @@ do {
   // Handle error
 }
 ```
+
 
 ### Loading files
 
@@ -111,6 +116,7 @@ do {
   // Handle error
 }
 ```
+
 
 ### Document Packages
 
@@ -159,6 +165,7 @@ do {
 You may provide additional information about your package type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
+
 ### Using DiskData
 
 DiskData is a helper class that lets you parse your files after retrieving them. This is useful when you're not sure what kind of file you are expected to recieve.  It is also used inside packages as it may contain a variety of different file types.
@@ -198,6 +205,7 @@ let loadedDiskDataArray = try Disk.diskDataArray(in: .documents, path: "some_fol
 let loadedFile: TestCodable = try loadedDiskData.decode()
 ```
 
+
 ### Subdirectories
 
 You may also provide a subdirectory (path) for your file.  Ensure that your path does not begin with a `/`
@@ -214,6 +222,7 @@ try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "som
 
 **Note:**
 You don't need to create subdirectories beforehand when storing `Package` files. `Package` files create a [Document Package](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) directory structure and therefore has to create the full directory path to achieve this.
+
 
 ### Other useful functionality
 
@@ -237,13 +246,21 @@ try Disk.create(path: "some_folder", in: .documents)
 try Disk.remove(path: "some_folder", in: .documents)
 ```
 
+
+## Whats missing (for now)
+
+* Support for image files in DiskData Disk classes
+
+
 ## Dependencies
 
 DiskKit has no dependencies
 
+
 ## Credits
 
 DiskKit is owned and maintained by Jacob Sikorski.
+
 
 ## License
 
