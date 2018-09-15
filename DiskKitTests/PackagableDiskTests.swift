@@ -31,10 +31,11 @@ class PackagableDiskTests: XCTestCase {
         )
         
         // When
-        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: fileName))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestPackage = try! PackagableDisk.package(withName: fileName, in: .documents) else {
+        guard let loadedFile: TestPackage = try! PackagableDisk.package(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -57,6 +58,7 @@ class PackagableDiskTests: XCTestCase {
         ]
 
         // When
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, withName: "example_2.package", path: "some_folder"))
         XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, withName: "example_1.package", path: "some_folder"))
 
