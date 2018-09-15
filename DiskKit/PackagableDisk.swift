@@ -36,35 +36,51 @@ public class PackageMap {
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
-        return try diskData.decode()
+        guard let DiskFile = files.first(where: { $0.fileName == name }) else { return nil }
+        return try DiskFile.decode()
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.fileName == name }) else {
+        guard let DiskFile = files.first(where: { $0.fileName == name }) else {
             throw PackageReadError.fileNotFound
         }
         
-        return try diskData.decode()
+        return try DiskFile.decode()
     }
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
-        return try diskData.decode()
+        guard let DiskFile = files.first(where: { $0.fileName == name }) else { return nil }
+        return try DiskFile.decode()
     }
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.fileName == name }) else {
+        guard let DiskFile = files.first(where: { $0.fileName == name }) else {
             throw PackageReadError.fileNotFound
         }
         
-        return try diskData.decode()
+        return try DiskFile.decode()
     }
 }
 
 public protocol Package {
     init(map: PackageMap) throws
     func mapping(map: PackageMap) throws
+}
+
+extension Package {
+    
+    func makeFileWrapper() throws -> FileWrapper {
+        let map = PackageMap()
+        try mapping(map: map)
+        var fileWrappers: [String: FileWrapper] = [:]
+        
+        for file in map.files {
+            let fileWrapper = FileWrapper(regularFileWithContents: file.data)
+            fileWrappers[file.fileName] = fileWrapper
+        }
+        
+        return FileWrapper(directoryWithFileWrappers: fileWrappers)
+    }
 }
 
 public class PackagableDisk {
@@ -76,19 +92,9 @@ public class PackagableDisk {
      * @packageName: what to name the package where the folder will be stored
      */
     public static func store(_ package: Package, to directory: Disk.Directory, withName packageName: String, path: String? = nil) throws -> URL {
+        let fileWrapper = try package.makeFileWrapper()
         let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
-        let resourcesUrl = packageUrl.appendingPathComponent("/Resources")
-        try Disk.createDirectory(at: resourcesUrl)
-        
-        let map = PackageMap()
-        try package.mapping(map: map)
-        
-        for file in map.files {
-            let fileName = file.fileName
-            let url = resourcesUrl.appendingPathComponent(fileName)
-            try Disk.store(fileData: file.data, to: url)
-        }
-        
+        try fileWrapper.write(to: packageUrl, options: [], originalContentsURL: nil)
         return packageUrl
     }
     
@@ -99,14 +105,14 @@ public class PackagableDisk {
      * @Returns: decoded package
      */
     public static func package<T: Package>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
-        let resourcesUrl = directory.makeUrl(paths: [path, packageName, "Resources"].compactMap({ $0 }))
-        let fileUrls = try Disk.contentsOfDirectory(at: resourcesUrl)
+        let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
+        let fileWrapper = try FileWrapper(url: packageUrl, options: [])
+        guard fileWrapper.isDirectory else { return nil }
         let map = PackageMap()
         
-        for fileUrl in fileUrls {
-            guard let data = Disk.fileData(at: fileUrl) else { continue }
-            let file = DiskData(data: data, name: fileUrl.lastPathComponent)
-            map.add(file)
+        for (fileName, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
+            guard let data = subFileWrapper.regularFileContents else { continue }
+            map.add(DiskData(data: data, name: fileName))
         }
         
         return try T(map: map)
