@@ -169,20 +169,22 @@ do {
 You may provide additional information about your package type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
-#### PackagableDisk supported objects
+#### PackagableDisk supported types
 
 Packagable supports the following types:
-* `Packagable` files
+* `Packagable` types
 * `Packagable` arrays (i.e. `[Packagable]`)
 ** These will be stored in auto-generated folder names
-* `Codable` files
+* `Codable` types
 * `Codable` arrays (i.e. `[Codable]`)
 ** These will be stored in auto-generated file names
-* `DiskCodable` files
+* `DiskCodable` types
 * `DiskCodable` arrays (i.e. `[DiskCodable]`)
 ** These will be stored in auto-generated folder names
-* `DiskData` files
+* `DiskData` types
 ** `DiskData` arrays (i.e. `[DiskData]`)
+* `UIImage` types
+* `String` types
 
 ### Using DiskData
 
