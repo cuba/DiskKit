@@ -179,7 +179,7 @@ Packagable supports the following types:
 * `DiskCodable` types
 * `DiskCodable` arrays (i.e. `[DiskCodable]`) *These will be stored in auto-generated file names*
 * `DiskData` types
-** `DiskData` arrays (i.e. `[DiskData]`)
+* `DiskData` arrays (i.e. `[DiskData]`) *These will be stored in auto-generated file names*
 * `UIImage` types
 * `String` types
 
