@@ -13,211 +13,17 @@ public enum PackageReadError: LocalizedError {
     case directoryNotFound
 }
 
-public class PackageMap {
-    private(set) public var files: [DiskData] = []
-    private(set) public var directories: [String: PackageMap] = [:]
-    
-    init() {}
-    
-    convenience init(_ fileWrapper: FileWrapper) throws {
-        self.init()
-        
-        for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
-            if subFileWrapper.isDirectory {
-                directories[name] = try PackageMap(subFileWrapper)
-            } else {
-                guard let data = subFileWrapper.regularFileContents else { continue }
-                add(DiskData(data: data, name: name))
-            }
-        }
-    }
-    
-    public func add<T: Encodable>(_ file: T, name: String) throws {
-        let diskData = try DiskData(file: file, name: name)
-        add(diskData)
-    }
-    
-    public func add<T: DiskEncodable>(_ file: T, name: String) throws {
-        let diskData = try DiskData(file: file, name: name)
-        add(diskData)
-    }
-    
-    public func add(_ file: DiskData) {
-        if let index = files.index(of: file) {
-            files[index] = file
-        } else {
-            files.append(file)
-        }
-    }
-    
-    public func add<T: DiskEncodable>(_ fileArray: [T], name: String) throws {
-        let parentMap = PackageMap()
-        
-        for (index, file) in fileArray.enumerated() {
-            try parentMap.add(file, name: "file_\(index)")
-        }
-        
-        directories[name] = parentMap
-    }
-
-    public func add<T: Encodable>(_ fileArray: [T], name: String) throws {
-        let parentMap = PackageMap()
-        
-        for (index, file) in fileArray.enumerated() {
-            try parentMap.add(file, name: "file_\(index)")
-        }
-        
-        directories[name] = parentMap
-    }
-    
-    public func add(_ fileArray: [DiskData], name: String) throws {
-        let parentMap = PackageMap()
-        
-        for (_, file) in fileArray.enumerated() {
-            parentMap.add(file)
-        }
-        
-        directories[name] = parentMap
-    }
-    
-    public func add<T: Package>(_ package: T, name: String) throws {
-        let map = PackageMap()
-        try package.mapping(map: map)
-        directories[name] = map
-    }
-    
-    public func add<T: Package>(_ packageArray: [T], name: String) throws {
-        let parentMap = PackageMap()
-        
-        for (index, package) in packageArray.enumerated() {
-            try parentMap.add(package, name: "package_\(index)")
-        }
-        
-        directories[name] = parentMap
-    }
-    
-    public func file<T: Decodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
-        return try diskData.decode()
-    }
-    
-    public func file<T: Decodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.fileName == name }) else {
-            throw PackageReadError.fileNotFound
-        }
-        
-        return try diskData.decode()
-    }
-    
-    public func fileArray<T: Decodable>() throws -> [T] {
-        var files: [T] = []
-        
-        for diskData in self.files {
-            let file: T = try diskData.decode()
-            files.append(file)
-        }
-        
-        return files
-    }
-    
-    public func fileArray<T: Decodable>(_ directoryName: String) throws -> [T] {
-        guard let map = directories[directoryName] else {
-            throw PackageReadError.directoryNotFound
-        }
-        
-        return try map.fileArray()
-    }
-    
-    public func file<T: DiskDecodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
-        return try diskData.decode()
-    }
-    
-    public func file<T: DiskDecodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.fileName == name }) else {
-            throw PackageReadError.fileNotFound
-        }
-        
-        return try diskData.decode()
-    }
-    
-    public func fileArray<T: DiskDecodable>() throws -> [T] {
-        var files: [T] = []
-        
-        for diskData in self.files {
-            let file: T = try diskData.decode()
-            files.append(file)
-        }
-        
-        return files
-    }
-    
-    public func fileArray<T: DiskDecodable>(_ directoryName: String) throws -> [T] {
-        guard let map = directories[directoryName] else {
-            throw PackageReadError.directoryNotFound
-        }
-        
-        return try map.fileArray()
-    }
-    
-    public func package<T: Package>(_ name: String) throws -> T? {
-        guard let map = directories[name] else { return nil }
-        return try T(map: map)
-    }
-    
-    public func package<T: Package>(_ name: String) throws -> T {
-        guard let map = directories[name] else {
-            throw PackageReadError.directoryNotFound
-        }
-        
-        return try T(map: map)
-    }
-    
-    public func packageArray<T: Package>(_ name: String) throws -> [T] {
-        guard let map = directories[name] else {
-            throw PackageReadError.directoryNotFound
-        }
-        
-        return try map.packageArray()
-    }
-    
-    public func packageArray<T: Package>() throws -> [T] {
-        var packages: [T] = []
-        
-        for (_, map) in directories {
-            let package = try T(map: map)
-            packages.append(package)
-        }
-        
-        return packages
-    }
-    
-    func makeFileWrapper() throws -> FileWrapper {
-        var fileWrappers: [String: FileWrapper] = [:]
-        
-        for file in files {
-            fileWrappers[file.fileName] = file.makeFileWrapper()
-        }
-        
-        for (directoryName, map) in directories {
-            fileWrappers[directoryName] = try map.makeFileWrapper()
-        }
-        
-        return FileWrapper(directoryWithFileWrappers: fileWrappers)
-    }
+public protocol Packagable {
+    init(package: Package) throws
+    func mapping(package: Package) throws
 }
 
-public protocol Package {
-    init(map: PackageMap) throws
-    func mapping(map: PackageMap) throws
-}
-
-extension Package {
+public extension Packagable {
     
-    func makeFileWrapper() throws -> FileWrapper {
-        let map = PackageMap()
-        try mapping(map: map)
-        return try map.makeFileWrapper()
+    public func makeFileWrapper() throws -> FileWrapper {
+        let package = Package()
+        try mapping(package: package)
+        return try package.makeFileWrapper()
     }
 }
 
@@ -229,7 +35,7 @@ public class PackagableDisk {
      * @directory: where to store the struct
      * @packageName: what to name the package where the folder will be stored
      */
-    public static func store(_ package: Package, to directory: Disk.Directory, withName packageName: String, path: String? = nil) throws -> URL {
+    public static func store(_ package: Packagable, to directory: Disk.Directory, withName packageName: String, path: String? = nil) throws -> URL {
         let fileWrapper = try package.makeFileWrapper()
         let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
         try fileWrapper.write(to: packageUrl, options: [], originalContentsURL: nil)
@@ -242,14 +48,14 @@ public class PackagableDisk {
      * @directory: directory where package data is stored
      * @Returns: decoded package
      */
-    public static func package<T: Package>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
+    public static func package<T: Packagable>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
         let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
         let fileWrapper = try FileWrapper(url: packageUrl, options: [])
-        let map = try PackageMap(fileWrapper)
-        return try T(map: map)
+        let package = try Package(fileWrapper)
+        return try T(package: package)
     }
     
-    static func packages<T: Package>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
+    static func packages<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
         let packageUrls = try Disk.contents(of: directory, path: path)
         let packageNames = packageUrls.map({ $0.lastPathComponent })
         var packages: [T] = []
