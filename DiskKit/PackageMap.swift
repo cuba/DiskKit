@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public class Package {
     private(set) public var files: [DiskData] = []
@@ -25,6 +26,13 @@ public class Package {
                 add(DiskData(data: data, name: name))
             }
         }
+    }
+    
+    // MARK: - Add
+    
+    public func add(_ image: UIImage, name: String, type: ImageFileType) throws {
+        let diskData = try DiskData(image: image, name: name, type: type)
+        add(diskData)
     }
     
     public func add<T: Encodable>(_ file: T, name: String) throws {
@@ -91,6 +99,8 @@ public class Package {
         directories[name] = package
     }
     
+    // MARK: - Get Decodable
+    
     public func file<T: Decodable>(_ name: String) throws -> T? {
         guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
         return try diskData.decode()
@@ -122,6 +132,8 @@ public class Package {
         
         return try package.fileArray()
     }
+    
+    // MARK: - Get DiskDecodable
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T? {
         guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
@@ -155,6 +167,22 @@ public class Package {
         return try package.fileArray()
     }
     
+    // MARK: - Get Image
+    
+    public func image(_ name: String) throws -> UIImage {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
+            throw PackageReadError.fileNotFound
+        }
+        
+        guard let image = diskData.image() else {
+            throw PackageReadError.unableToReadFile
+        }
+        
+        return image
+    }
+    
+    // MARK: - Get Packagable
+    
     public func file<T: Packagable>(_ name: String) throws -> T? {
         guard let package = directories[name] else { return nil }
         return try T(package: package)
@@ -187,7 +215,7 @@ public class Package {
         return files
     }
     
-    func makeFileWrapper() throws -> FileWrapper {
+    public func makeFileWrapper() throws -> FileWrapper {
         var fileWrappers: [String: FileWrapper] = [:]
         
         for file in files {

@@ -11,6 +11,7 @@ import Foundation
 public enum PackageReadError: LocalizedError {
     case fileNotFound
     case directoryNotFound
+    case unableToReadFile
 }
 
 public protocol Packagable {

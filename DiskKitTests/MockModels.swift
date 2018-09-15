@@ -103,10 +103,15 @@ struct MockSubPackage: Packagable {
     var diskCodable: MockDiskCodable
     var codableArray: [MockCodable]
     var diskCodableArray: [MockDiskCodable]
+    var image: UIImage
+    var image2: UIImage
     
     init(id: String) {
         self.codable = MockCodable(id: "CODABLE_\(id)")
         self.diskCodable = MockDiskCodable(id: "DISK_CODABLE_\(id)")
+        let bundle = Bundle(for: EncodableDiskTests.self)
+        self.image = UIImage(named: "example", in: bundle, compatibleWith: nil)!
+        self.image2 = UIImage(named: "example", in: bundle, compatibleWith: nil)!
         
         self.codableArray = [
             MockCodable(id: "CODABLE_\(id)_1"),
@@ -126,6 +131,8 @@ struct MockSubPackage: Packagable {
         self.diskCodable = try package.file("disk_codable.json")
         self.codableArray = try package.fileArray("codable_list")
         self.diskCodableArray = try package.fileArray("disk_codable_list")
+        self.image = try package.image("image.jpg")
+        self.image2 = try package.image("image.png")
     }
     
     func mapping(package: Package) throws {
@@ -133,6 +140,8 @@ struct MockSubPackage: Packagable {
         try package.add(diskCodable, name: "disk_codable.json")
         try package.add(codableArray, name: "codable_list")
         try package.add(diskCodableArray, name: "disk_codable_list")
+        try package.add(image, name: "image.jpg", type: .jpg(compressionQuality: 0.5))
+        try package.add(image2, name: "image.png", type: .png)
     }
 }
 
