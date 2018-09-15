@@ -36,29 +36,30 @@ public class PackageMap {
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T? {
-        guard let DiskFile = files.first(where: { $0.fileName == name }) else { return nil }
-        return try DiskFile.decode()
+        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
+        return try diskData.decode()
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T {
-        guard let DiskFile = files.first(where: { $0.fileName == name }) else {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
             throw PackageReadError.fileNotFound
         }
         
-        return try DiskFile.decode()
+        return try diskData.decode()
     }
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T? {
-        guard let DiskFile = files.first(where: { $0.fileName == name }) else { return nil }
-        return try DiskFile.decode()
+        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
+        return try diskData.decode()
     }
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T {
-        guard let DiskFile = files.first(where: { $0.fileName == name }) else {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
             throw PackageReadError.fileNotFound
         }
         
-        return try DiskFile.decode()
+        return try diskData.decode()
+    }
     }
 }
 
@@ -75,8 +76,7 @@ extension Package {
         var fileWrappers: [String: FileWrapper] = [:]
         
         for file in map.files {
-            let fileWrapper = FileWrapper(regularFileWithContents: file.data)
-            fileWrappers[file.fileName] = fileWrapper
+            fileWrappers[file.fileName] = file.makeFileWrapper()
         }
         
         return FileWrapper(directoryWithFileWrappers: fileWrappers)

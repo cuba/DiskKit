@@ -52,6 +52,12 @@ public struct DiskData {
     public func decode<T: DiskDecodable>() throws -> T {
         return try T(data)
     }
+    
+    public func makeFileWrapper() -> FileWrapper {
+        let fileWrapper = FileWrapper(regularFileWithContents: data)
+        fileWrapper.filename = fileName
+        return fileWrapper
+    }
 }
 
 extension DiskData: Equatable {
