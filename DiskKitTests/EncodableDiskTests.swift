@@ -24,14 +24,14 @@ class EncodableDiskTests: XCTestCase {
     func testGivenCodableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
         let fileName = "example.json"
-        let testFile = TestCodable(id: "ABC")
+        let testFile = MockCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -42,7 +42,7 @@ class EncodableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
         // Given
-        let testFiles = [TestCodable(id: "ABC"), TestCodable(id: "123")]
+        let testFiles = [MockCodable(id: "ABC"), MockCodable(id: "123")]
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
@@ -50,7 +50,7 @@ class EncodableDiskTests: XCTestCase {
         XCTAssertNoThrow(try EncodableDisk.store(testFiles[1], to: .documents, as: "example_2.json", path: "some_folder"))
         
         // Then
-        guard let loadedFiles: [TestCodable] = try? EncodableDisk.files(in: .documents, path: "some_folder") else {
+        guard let loadedFiles: [MockCodable] = try? EncodableDisk.files(in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -63,7 +63,7 @@ class EncodableDiskTests: XCTestCase {
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
         let fileName = "example.json"
-        let testFile = TestCodable(id: "ABC")
+        let testFile = MockCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
@@ -75,14 +75,14 @@ class EncodableDiskTests: XCTestCase {
     func testGivenDiskCodableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
         let fileName = "example.json"
-        let testFile = TestDiskCodable(id: "ABC")
+        let testFile = MockDiskCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -94,14 +94,14 @@ class EncodableDiskTests: XCTestCase {
     func testGivenDiskCodableFile_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
         // Given
         let fileName = "example.json"
-        let testFile = TestDiskCodable(id: "ABC")
+        let testFile = MockDiskCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: TestDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -113,7 +113,7 @@ class EncodableDiskTests: XCTestCase {
     func testGivenDiskCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
         let fileName = "example.json"
-        let testFile = TestDiskCodable(id: "ABC")
+        let testFile = MockDiskCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))

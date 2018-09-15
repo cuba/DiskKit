@@ -24,7 +24,7 @@ class DiskTests: XCTestCase {
     func testGivenDiskData_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
         let fileName = "example.json"
-        let testFile = TestCodable(id: "ABC")
+        let testFile = MockCodable(id: "ABC")
         
         guard let diskData = try? DiskData(file: testFile, name: fileName) else {
             XCTAssert(false)
@@ -41,7 +41,7 @@ class DiskTests: XCTestCase {
             return
         }
         
-        guard let loadedFile: TestCodable = try! loadedDiskData.decode() else {
+        guard let loadedFile: MockCodable = try! loadedDiskData.decode() else {
             XCTAssert(false)
             return
         }
@@ -53,7 +53,7 @@ class DiskTests: XCTestCase {
     
     func testGivenDiskData_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
         // Given
-        let testFiles = [TestCodable(id: "ABC"), TestCodable(id: "123")]
+        let testFiles = [MockCodable(id: "ABC"), MockCodable(id: "123")]
         
         let diskDataArray = testFiles.enumerated().compactMap({
             return try? DiskData(file: $0.element, name: "example_\($0.offset)")
@@ -70,7 +70,7 @@ class DiskTests: XCTestCase {
             return
         }
         
-        let loadedFiles: [TestCodable] = loadedDiskDataArray.compactMap({
+        let loadedFiles: [MockCodable] = loadedDiskDataArray.compactMap({
             return try? $0.decode()
         })
         
@@ -83,7 +83,7 @@ class DiskTests: XCTestCase {
     func testGivenDiskData_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
         let fileName = "example.json"
-        let testFile = TestCodable(id: "ABC")
+        let testFile = MockCodable(id: "ABC")
         
         guard let diskData = try? DiskData(file: testFile, name: fileName) else {
             XCTAssert(false)

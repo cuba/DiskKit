@@ -1,5 +1,5 @@
 //
-//  TestCodable.swift
+//  MockCodable.swift
 //  DiskKitTests
 //
 //  Created by Jacob Sikorski on 2018-09-10.
@@ -9,7 +9,7 @@
 import Foundation
 @testable import DiskKit
 
-struct TestCodable: Codable {
+struct MockCodable: Codable {
     var id = UUID().uuidString
     
     init(id: String) {
@@ -17,14 +17,14 @@ struct TestCodable: Codable {
     }
 }
 
-extension TestCodable: Equatable {
+extension MockCodable: Equatable {
     
-    public static func == (lhs: TestCodable, rhs: TestCodable) -> Bool {
+    public static func == (lhs: MockCodable, rhs: MockCodable) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-struct TestDiskCodable: DiskCodable {
+struct MockDiskCodable: DiskCodable {
     var id = UUID().uuidString
     
     init(id: String) {
@@ -40,18 +40,18 @@ struct TestDiskCodable: DiskCodable {
     }
 }
 
-extension TestDiskCodable: Equatable {
+extension MockDiskCodable: Equatable {
     
-    public static func == (lhs: TestDiskCodable, rhs: TestDiskCodable) -> Bool {
+    public static func == (lhs: MockDiskCodable, rhs: MockDiskCodable) -> Bool {
         return lhs.id == rhs.id
     }
 }
 
-struct TestPackage: Package {
-    var codable: TestCodable
-    var diskCodable: TestDiskCodable
+struct MockPackage: Package {
+    var codable: MockCodable
+    var diskCodable: MockDiskCodable
     
-    init(codable: TestCodable, diskCodable: TestDiskCodable) {
+    init(codable: MockCodable, diskCodable: MockDiskCodable) {
         self.codable = codable
         self.diskCodable = diskCodable
     }
@@ -67,9 +67,9 @@ struct TestPackage: Package {
     }
 }
 
-extension TestPackage: Equatable {
+extension MockPackage: Equatable {
     
-    public static func == (lhs: TestPackage, rhs: TestPackage) -> Bool {
+    public static func == (lhs: MockPackage, rhs: MockPackage) -> Bool {
         return lhs.codable == rhs.codable && lhs.diskCodable == rhs.diskCodable
     }
 }
