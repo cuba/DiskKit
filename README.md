@@ -260,11 +260,6 @@ try Disk.remove(path: "some_folder", in: .documents)
 ```
 
 
-## Whats missing (for now)
-
-* Support for image files in DiskData Disk classes
-
-
 ## Dependencies
 
 DiskKit has no dependencies
