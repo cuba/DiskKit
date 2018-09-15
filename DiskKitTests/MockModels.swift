@@ -50,44 +50,89 @@ extension MockDiskCodable: Equatable {
 struct MockPackage: Package {
     var codable: MockCodable
     var diskCodable: MockDiskCodable
-    var subPackage: AnotherMockPackage
+    var subPackage: MockSubPackage
+    var packageArray: [MockSubPackage]
+    var codableArray: [MockCodable]
+    var diskCodableArray: [MockDiskCodable]
     
-    init(codable: MockCodable, diskCodable: MockDiskCodable, subPackage: AnotherMockPackage) {
-        self.codable = codable
-        self.diskCodable = diskCodable
-        self.subPackage = subPackage
+    init(id: String) {
+        self.codable = MockCodable(id: "CODABLE_\(id)")
+        self.diskCodable = MockDiskCodable(id: "DISK_CODABLE_\(id)")
+        self.subPackage = MockSubPackage(id: id)
+        
+        self.packageArray = [
+            MockSubPackage(id: "id_\(1)"),
+            MockSubPackage(id: "id_\(2)"),
+            MockSubPackage(id: "id_\(3)")
+        ]
+        
+        self.codableArray = [
+            MockCodable(id: "CODABLE_\(id)_1"),
+            MockCodable(id: "CODABLE_\(id)_2"),
+            MockCodable(id: "CODABLE_\(id)_3")
+        ]
+        
+        self.diskCodableArray = [
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_1"),
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_2"),
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_3")
+        ]
     }
     
     init(map: PackageMap) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
         self.subPackage = try map.package("sub_package")
+        self.codableArray = try map.fileArray("codable_list")
+        self.diskCodableArray = try map.fileArray("disk_codable_list")
+        self.packageArray = try map.packageArray("sub_package_list")
     }
     
     func mapping(map: PackageMap) throws {
         try map.add(codable, name: "codable.json")
         try map.add(diskCodable, name: "disk_codable.json")
         try map.add(subPackage, name: "sub_package")
+        try map.add(codableArray, name: "codable_list")
+        try map.add(diskCodableArray, name: "disk_codable_list")
+        try map.add(packageArray, name: "sub_package_list")
     }
 }
 
-struct AnotherMockPackage: Package {
+struct MockSubPackage: Package {
     var codable: MockCodable
     var diskCodable: MockDiskCodable
+    var codableArray: [MockCodable]
+    var diskCodableArray: [MockDiskCodable]
     
-    init(codable: MockCodable, diskCodable: MockDiskCodable) {
-        self.codable = codable
-        self.diskCodable = diskCodable
+    init(id: String) {
+        self.codable = MockCodable(id: "CODABLE_\(id)")
+        self.diskCodable = MockDiskCodable(id: "DISK_CODABLE_\(id)")
+        
+        self.codableArray = [
+            MockCodable(id: "CODABLE_\(id)_1"),
+            MockCodable(id: "CODABLE_\(id)_2"),
+            MockCodable(id: "CODABLE_\(id)_3")
+        ]
+        
+        self.diskCodableArray = [
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_1"),
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_2"),
+            MockDiskCodable(id: "DISK_CODABLE_\(id)_3")
+        ]
     }
     
     init(map: PackageMap) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
+        self.codableArray = try map.fileArray("codable_list")
+        self.diskCodableArray = try map.fileArray("disk_codable_list")
     }
     
     func mapping(map: PackageMap) throws {
         try map.add(codable, name: "codable.json")
         try map.add(diskCodable, name: "disk_codable.json")
+        try map.add(codableArray, name: "codable_list")
+        try map.add(diskCodableArray, name: "disk_codable_list")
     }
 }
 
