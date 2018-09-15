@@ -93,18 +93,16 @@ public class Disk {
      */
     public static func diskDataArray(in directory: Directory, path: String? = nil) throws -> [DiskData] {
         let urls = try contents(of: directory, path: path)
-        var diskDatas: [DiskData] = []
         
-        for url in urls {
-            let fileName = url.lastPathComponent
-            guard let data = self.fileData(at: url) else { continue }
-            diskDatas.append(DiskData(data: data, name: fileName))
-        }
+        let diskDatas: [DiskData] = urls.compactMap({
+            let fileName = $0.lastPathComponent
+            return try? self.diskData(withName: fileName, in: directory, path: path)!
+        })
         
         return diskDatas
     }
     
-    // MARK: - Directory
+    // MARK: - Files
     
     /**
      * Stores a file in the directoy specified. Replaces any file with the same name.
@@ -130,6 +128,24 @@ public class Disk {
         let urls = try contents(of: directory, path: path)
         return urls.compactMap({ self.fileData(at: $0) })
     }
+    
+    /**
+     * Remove specified file from specified directory
+     */
+    public static func remove(fileName: String, from directory: Directory, path: String? = nil) {
+        let url = directory.makeUrl(path: path, fileName: fileName)
+        removeFile(at: url)
+    }
+    
+    /**
+     * Returns BOOL indicating whether file exists at specified directory with specified file name
+     */
+    public static func fileExists(in directory: Directory, withFileName fileName: String, path: String? = nil) -> Bool {
+        let url = directory.makeUrl(path: path, fileName: fileName)
+        return FileManager.default.fileExists(atPath: url.path)
+    }
+    
+    // MARK: - Folders
     
     /**
      * Remove all files at specified directory
@@ -162,22 +178,6 @@ public class Disk {
     public static func contents(of directory: Directory, path: String? = nil) throws -> [URL] {
         let url = directory.makeUrl(path: path)
         return try self.contentsOfDirectory(at: url)
-    }
-    
-    /**
-     * Remove specified file from specified directory
-     */
-    public static func remove(fileName: String, from directory: Directory, path: String? = nil) {
-        let url = directory.makeUrl(path: path, fileName: fileName)
-        removeFile(at: url)
-    }
-    
-    /**
-     * Returns BOOL indicating whether file exists at specified directory with specified file name
-     */
-    public static func fileExists(in directory: Directory, withFileName fileName: String, path: String? = nil) -> Bool {
-        let url = directory.makeUrl(path: path, fileName: fileName)
-        return FileManager.default.fileExists(atPath: url.path)
     }
     
     /**
