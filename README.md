@@ -125,7 +125,7 @@ You may also store [Document Packages](https://developer.apple.com/library/archi
 Packages also support nested packages which need to extend the `Package` protocol.
 
 ```swift
-struct TestPackage: Package {
+struct TestPackage: Packagable {
     var codable: TestCodable
     var diskCodable: TestDiskCodable
     var subPackage: AnotherTestPackage
@@ -139,7 +139,7 @@ struct TestPackage: Package {
     init(map: PackageMap) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
-        self.subPackage = try.map.package("sub_package")
+        self.subPackage = try.map.file("sub_package")
     }
     
     func mapping(map: PackageMap) throws {
@@ -149,8 +149,6 @@ struct TestPackage: Package {
     }
 }
 ```
-
-To store packages, you need to use the PackagableDisk class
 
 ```swift
 let testFile = TestPackage(
@@ -171,6 +169,20 @@ do {
 You may provide additional information about your package type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
+#### PackagableDisk supported objects
+
+Packagable supports the following types:
+* `Packagable` files
+* `Packagable` arrays (i.e. `[Packagable]`)
+** These will be stored in auto-generated folder names
+* `Codable` files
+* `Codable` arrays (i.e. `[Codable]`)
+** These will be stored in auto-generated file names
+* `DiskCodable` files
+* `DiskCodable` arrays (i.e. `[DiskCodable]`)
+** These will be stored in auto-generated folder names
+* `DiskData` files
+** `DiskData` arrays (i.e. `[DiskData]`)
 
 ### Using DiskData
 
