@@ -122,24 +122,30 @@ do {
 
 You may also store [Document Packages](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).  You just need to implement the Package protocol:
 
+Packages also support nested packages which need to extend the `Package` protocol.
+
 ```swift
 struct TestPackage: Package {
     var codable: TestCodable
     var diskCodable: TestDiskCodable
+    var subPackage: AnotherTestPackage
     
-    init(codable: TestCodable, diskCodable: TestDiskCodable) {
+    init(codable: TestCodable, diskCodable: TestDiskCodable, subPackage: AnotherTestPackage) {
         self.codable = codable
         self.diskCodable = diskCodable
+        self.subPackage = subPackage
     }
     
     init(map: PackageMap) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
+        self.subPackage = try.map.package("sub_package")
     }
     
     func mapping(map: PackageMap) throws {
         try map.add(codable, name: "codable.json")
         try map.add(diskCodable, name: "disk_codable.json")
+        try map.add(subPackage, name: "sub_package")
     }
 }
 ```
@@ -219,10 +225,6 @@ try Disk.create(path: "some_folder", in: .documents)
 ```swift
 try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "some_folder")
 ```
-
-**Note:**
-You don't need to create subdirectories beforehand when storing `Package` files. `Package` files create a [Document Package](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html) directory structure and therefore has to create the full directory path to achieve this.
-
 
 ### Other useful functionality
 
