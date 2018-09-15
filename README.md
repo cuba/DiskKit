@@ -173,14 +173,11 @@ You can get more information about Document Packages [here](https://developer.ap
 
 Packagable supports the following types:
 * `Packagable` types
-* `Packagable` arrays (i.e. `[Packagable]`)
-** These will be stored in auto-generated folder names
+* `Packagable` arrays (i.e. `[Packagable]`) *These will be stored in auto-generated folder names*
 * `Codable` types
-* `Codable` arrays (i.e. `[Codable]`)
-** These will be stored in auto-generated file names
+* `Codable` arrays (i.e. `[Codable]`) *These will be stored in auto-generated file names*
 * `DiskCodable` types
-* `DiskCodable` arrays (i.e. `[DiskCodable]`)
-** These will be stored in auto-generated folder names
+* `DiskCodable` arrays (i.e. `[DiskCodable]`) *These will be stored in auto-generated file names*
 * `DiskData` types
 ** `DiskData` arrays (i.e. `[DiskData]`)
 * `UIImage` types
