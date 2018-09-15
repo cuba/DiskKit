@@ -27,7 +27,11 @@ class PackagableDiskTests: XCTestCase {
         
         let testFile = MockPackage(
             codable: MockCodable(id: "CODABLE_ABC"),
-            diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+            diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC"),
+            subPackage: AnotherMockPackage(
+                codable: MockCodable(id: "CODABLE_ABC"),
+                diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+            )
         )
         
         // When
@@ -35,13 +39,17 @@ class PackagableDiskTests: XCTestCase {
         XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: fileName, path: "some_folder"))
         
         // Then
-        guard let loadedFile: MockPackage = try! PackagableDisk.package(withName: fileName, in: .documents, path: "some_folder") else {
+        do {
+            guard let loadedFile: MockPackage = try PackagableDisk.package(withName: fileName, in: .documents, path: "some_folder") else {
+                XCTAssert(false)
+                return
+            }
+            
+            XCTAssertNotNil(loadedFile)
+            XCTAssert(loadedFile == testFile)
+        } catch {
             XCTAssert(false)
-            return
         }
-        
-        XCTAssertNotNil(loadedFile)
-        XCTAssert(loadedFile == testFile)
     }
     
     func testGivenCodableFile_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
@@ -49,11 +57,19 @@ class PackagableDiskTests: XCTestCase {
         let testFiles = [
             MockPackage(
                 codable: MockCodable(id: "CODABLE_ABC"),
-                diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+                diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC"),
+                subPackage: AnotherMockPackage(
+                    codable: MockCodable(id: "CODABLE_ABC"),
+                    diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+                )
             ),
             MockPackage(
                 codable: MockCodable(id: "CODABLE_123"),
-                diskCodable: MockDiskCodable(id: "DISK_CODABLE_123")
+                diskCodable: MockDiskCodable(id: "DISK_CODABLE_123"),
+                subPackage: AnotherMockPackage(
+                    codable: MockCodable(id: "CODABLE_123"),
+                    diskCodable: MockDiskCodable(id: "DISK_CODABLE_123")
+                )
             )
         ]
 
@@ -63,14 +79,19 @@ class PackagableDiskTests: XCTestCase {
         XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, withName: "example_1.package", path: "some_folder"))
 
         // Then
-        guard let loadedFiles: [MockPackage] = try? PackagableDisk.packages(in: .documents, path: "some_folder") else {
+        do {
+            let loadedFiles: [MockPackage] = try PackagableDisk.packages(in: .documents, path: "some_folder")
+            
+            guard loadedFiles.count == 2 else {
+                XCTAssert(false)
+                return
+            }
+            
+            XCTAssert(loadedFiles[0] == testFiles[0])
+            XCTAssert(loadedFiles[1] == testFiles[1])
+        } catch {
             XCTAssert(false)
-            return
         }
-
-        XCTAssert(loadedFiles.count == 2)
-        XCTAssert(loadedFiles[0] == testFiles[0])
-        XCTAssert(loadedFiles[1] == testFiles[1])
     }
     
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
@@ -79,7 +100,11 @@ class PackagableDiskTests: XCTestCase {
         
         let testFile = MockPackage(
             codable: MockCodable(id: "CODABLE_ABC"),
-            diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+            diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC"),
+            subPackage: AnotherMockPackage(
+                codable: MockCodable(id: "CODABLE_ABC"),
+                diskCodable: MockDiskCodable(id: "DISK_CODABLE_ABC")
+            )
         )
         
         // When

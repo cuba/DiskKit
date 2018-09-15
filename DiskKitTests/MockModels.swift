@@ -50,6 +50,30 @@ extension MockDiskCodable: Equatable {
 struct MockPackage: Package {
     var codable: MockCodable
     var diskCodable: MockDiskCodable
+    var subPackage: AnotherMockPackage
+    
+    init(codable: MockCodable, diskCodable: MockDiskCodable, subPackage: AnotherMockPackage) {
+        self.codable = codable
+        self.diskCodable = diskCodable
+        self.subPackage = subPackage
+    }
+    
+    init(map: PackageMap) throws {
+        self.codable = try map.file("codable.json")
+        self.diskCodable = try map.file("disk_codable.json")
+        self.subPackage = try map.package("sub_package")
+    }
+    
+    func mapping(map: PackageMap) throws {
+        try map.add(codable, name: "codable.json")
+        try map.add(diskCodable, name: "disk_codable.json")
+        try map.add(subPackage, name: "sub_package")
+    }
+}
+
+struct AnotherMockPackage: Package {
+    var codable: MockCodable
+    var diskCodable: MockDiskCodable
     
     init(codable: MockCodable, diskCodable: MockDiskCodable) {
         self.codable = codable

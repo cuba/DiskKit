@@ -10,12 +10,27 @@ import Foundation
 
 public enum PackageReadError: LocalizedError {
     case fileNotFound
+    case packageNotFound
 }
 
 public class PackageMap {
-    var files: [DiskData] = []
+    private(set) public var files: [DiskData] = []
+    private(set) public var directories: [String: PackageMap] = [:]
     
     init() {}
+    
+    convenience init(_ fileWrapper: FileWrapper) throws {
+        self.init()
+        
+        for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
+            if subFileWrapper.isDirectory {
+                directories[name] = try PackageMap(subFileWrapper)
+            } else {
+                guard let data = subFileWrapper.regularFileContents else { continue }
+                add(DiskData(data: data, name: name))
+            }
+        }
+    }
     
     public func add<T: Encodable>(_ file: T, name: String) throws {
         let diskData = try DiskData(file: file, name: name)
@@ -33,6 +48,12 @@ public class PackageMap {
         } else {
             files.append(file)
         }
+    }
+    
+    public func add<T: Package>(_ package: T, name: String) throws {
+        let map = PackageMap()
+        try package.mapping(map: map)
+        directories[name] = map
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T? {
@@ -60,6 +81,32 @@ public class PackageMap {
         
         return try diskData.decode()
     }
+    
+    public func package<T: Package>(_ name: String) throws -> T? {
+        guard let map = directories[name] else { return nil }
+        return try T(map: map)
+    }
+    
+    public func package<T: Package>(_ name: String) throws -> T {
+        guard let map = directories[name] else {
+            throw PackageReadError.packageNotFound
+        }
+        
+        return try T(map: map)
+    }
+    
+    func makeFileWrapper() throws -> FileWrapper {
+        var fileWrappers: [String: FileWrapper] = [:]
+        
+        for file in files {
+            fileWrappers[file.fileName] = file.makeFileWrapper()
+        }
+        
+        for (directoryName, map) in directories {
+            fileWrappers[directoryName] = try map.makeFileWrapper()
+        }
+        
+        return FileWrapper(directoryWithFileWrappers: fileWrappers)
     }
 }
 
@@ -73,13 +120,7 @@ extension Package {
     func makeFileWrapper() throws -> FileWrapper {
         let map = PackageMap()
         try mapping(map: map)
-        var fileWrappers: [String: FileWrapper] = [:]
-        
-        for file in map.files {
-            fileWrappers[file.fileName] = file.makeFileWrapper()
-        }
-        
-        return FileWrapper(directoryWithFileWrappers: fileWrappers)
+        return try map.makeFileWrapper()
     }
 }
 
@@ -107,14 +148,7 @@ public class PackagableDisk {
     public static func package<T: Package>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
         let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
         let fileWrapper = try FileWrapper(url: packageUrl, options: [])
-        guard fileWrapper.isDirectory else { return nil }
-        let map = PackageMap()
-        
-        for (fileName, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
-            guard let data = subFileWrapper.regularFileContents else { continue }
-            map.add(DiskData(data: data, name: fileName))
-        }
-        
+        let map = try PackageMap(fileWrapper)
         return try T(map: map)
     }
     
