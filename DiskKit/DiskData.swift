@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 
-public enum ImageEncodingError: Error {
-    case failedToEncode
+public enum FileEncodingError: Error {
+    case failedToEncodeImage
+    case failedToEncodeText
 }
 
 public enum ImageFileType {
@@ -37,7 +38,7 @@ public enum ImageFileType {
 public extension UIImage {
     func encode(to type: ImageFileType) throws -> Data {
         guard let data = type.data(from: self) else {
-            throw ImageEncodingError.failedToEncode
+            throw FileEncodingError.failedToEncodeImage
         }
         
         return data
@@ -84,6 +85,19 @@ public struct DiskData {
     }
     
     /**
+     * Encode the specified string
+     * @text: the text to encode into a utf8 text file
+     * @name: the name this file will be given in disk
+     */
+    public init(text: String, name: String) throws {
+        guard let data = text.data(using: .utf8) else {
+            throw FileEncodingError.failedToEncodeText
+        }
+        
+        self.init(data: data, name: name)
+    }
+    
+    /**
      * Decode the data to the specified Decodable type
      * @Returns: decoded struct model(s) of data
      */
@@ -101,11 +115,19 @@ public struct DiskData {
     }
     
     /**
-     * Decode the data to the specified DiskDecodable type
-     * @Returns: decoded struct model(s) of data
+     * Decode the data a UIImage
+     * @Returns: decoded image
      */
     public func image() -> UIImage? {
         return UIImage(data: data)
+    }
+    
+    /**
+     * Decode the data a UIImage
+     * @Returns: decoded image
+     */
+    public func text() -> String? {
+        return String(data: data, encoding: .utf8)
     }
     
     public func makeFileWrapper() -> FileWrapper {

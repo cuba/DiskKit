@@ -30,6 +30,11 @@ public class Package {
     
     // MARK: - Add
     
+    public func add(text: String, name: String) throws {
+        let diskData = try DiskData(text: text, name: name)
+        add(diskData)
+    }
+    
     public func add(_ image: UIImage, name: String, type: ImageFileType) throws {
         let diskData = try DiskData(image: image, name: name, type: type)
         add(diskData)
@@ -97,6 +102,20 @@ public class Package {
         }
         
         directories[name] = package
+    }
+    
+    // MARK: - Get DiskData
+    
+    public func diskData(_ name: String) throws -> DiskData {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
+            throw PackageReadError.fileNotFound
+        }
+        
+        return diskData
+    }
+    
+    public func diskData(_ name: String) -> DiskData? {
+        return files.first(where: { $0.fileName == name })
     }
     
     // MARK: - Get Decodable
@@ -170,15 +189,45 @@ public class Package {
     // MARK: - Get Image
     
     public func image(_ name: String) throws -> UIImage {
-        guard let diskData = files.first(where: { $0.fileName == name }) else {
-            throw PackageReadError.fileNotFound
-        }
+        let diskData: DiskData = try self.diskData(name)
         
         guard let image = diskData.image() else {
             throw PackageReadError.unableToReadFile
         }
         
         return image
+    }
+    
+    public func image(_ name: String) throws -> UIImage? {
+        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
+        
+        guard let image = diskData.image() else {
+            throw PackageReadError.unableToReadFile
+        }
+        
+        return image
+    }
+    
+    // MARK: - Get Text
+    
+    public func text(_ name: String) throws -> String {
+        let diskData: DiskData = try self.diskData(name)
+        
+        guard let text = diskData.text() else {
+            throw PackageReadError.unableToReadFile
+        }
+        
+        return text
+    }
+    
+    public func text(_ name: String) throws -> String? {
+        guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
+        
+        guard let text = diskData.text() else {
+            throw PackageReadError.unableToReadFile
+        }
+        
+        return text
     }
     
     // MARK: - Get Packagable
