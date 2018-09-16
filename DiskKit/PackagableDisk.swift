@@ -16,14 +16,14 @@ public enum PackageReadError: LocalizedError {
 
 public protocol Packagable {
     init(package: Package) throws
-    func mapping(package: Package) throws
+    func fill(package: Package) throws
 }
 
 public extension Packagable {
     
     public func makeFileWrapper() throws -> FileWrapper {
         let package = Package()
-        try mapping(package: package)
+        try fill(package: package)
         return try package.makeFileWrapper()
     }
 }

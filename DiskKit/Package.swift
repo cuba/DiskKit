@@ -90,7 +90,7 @@ public class Package {
     
     public func add<T: Packagable>(_ packagable: T, name: String) throws {
         let package = Package()
-        try packagable.mapping(package: package)
+        try packagable.fill(package: package)
         directories[name] = package
     }
     

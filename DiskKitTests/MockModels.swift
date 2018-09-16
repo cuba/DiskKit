@@ -88,7 +88,7 @@ struct MockPackage: Packagable {
         self.packagableArray = try package.fileArray("sub_package_list")
     }
     
-    func mapping(package: Package) throws {
+    func fill(package: Package) throws {
         try package.add(codable, name: "codable.json")
         try package.add(diskCodable, name: "disk_codable.json")
         try package.add(subPackage, name: "sub_package")
@@ -138,7 +138,7 @@ struct MockSubPackage: Packagable {
         self.exampleText = try package.text("example.txt", encoding: .utf8)
     }
     
-    func mapping(package: Package) throws {
+    func fill(package: Package) throws {
         try package.add(codable, name: "codable.json")
         try package.add(diskCodable, name: "disk_codable.json")
         try package.add(codableArray, name: "codable_list")
