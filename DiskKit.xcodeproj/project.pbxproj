@@ -11,7 +11,7 @@
 		DA1A8B5521477369005C3D05 /* EncodableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */; };
 		DA1A8B572147737D005C3D05 /* PackagableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */; };
 		DA1A8B5B214773BE005C3D05 /* DiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5A214773BE005C3D05 /* DiskTests.swift */; };
-		DA1A8B7A214D9E8B005C3D05 /* PackageMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B79214D9E8B005C3D05 /* PackageMap.swift */; };
+		DA1A8B7A214D9E8B005C3D05 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B79214D9E8B005C3D05 /* Package.swift */; };
 		DA1A8B7E214DAD8A005C3D05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */; };
 		DAD0109E214426350038E5A4 /* DiskKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAD01094214426340038E5A4 /* DiskKit.framework */; };
 		DAD010A5214426350038E5A4 /* DiskKit.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD01097214426340038E5A4 /* DiskKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -37,7 +37,7 @@
 		DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableDiskTests.swift; sourceTree = "<group>"; };
 		DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagableDiskTests.swift; sourceTree = "<group>"; };
 		DA1A8B5A214773BE005C3D05 /* DiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskTests.swift; sourceTree = "<group>"; };
-		DA1A8B79214D9E8B005C3D05 /* PackageMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageMap.swift; sourceTree = "<group>"; };
+		DA1A8B79214D9E8B005C3D05 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DAD01094214426340038E5A4 /* DiskKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DiskKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAD01097214426340038E5A4 /* DiskKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DiskKit.h; sourceTree = "<group>"; };
@@ -135,7 +135,7 @@
 				DAE483A0214572C800C19A58 /* DiskData.swift */,
 				DAE4839E21456C0800C19A58 /* EncodableDisk.swift */,
 				DAE483A321457B9800C19A58 /* PackagableDisk.swift */,
-				DA1A8B79214D9E8B005C3D05 /* PackageMap.swift */,
+				DA1A8B79214D9E8B005C3D05 /* Package.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
@@ -253,7 +253,7 @@
 				DAE4834B2144486300C19A58 /* SearchPathDirectory+Extensions.swift in Sources */,
 				DAE483A421457B9800C19A58 /* PackagableDisk.swift in Sources */,
 				DAD01100214427AB0038E5A4 /* Disk.swift in Sources */,
-				DA1A8B7A214D9E8B005C3D05 /* PackageMap.swift in Sources */,
+				DA1A8B7A214D9E8B005C3D05 /* Package.swift in Sources */,
 				DAE483A1214572C800C19A58 /* DiskData.swift in Sources */,
 				DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */,
 			);
