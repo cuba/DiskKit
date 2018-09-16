@@ -47,10 +47,10 @@ public extension UIImage {
 
 public struct DiskData {
     
-    let fileName: String
-    let data: Data
+    public let fileName: String
+    public let data: Data
     
-    init(data: Data, name: String) {
+    public init(data: Data, name: String) {
         self.fileName = name
         self.data = data
     }
@@ -89,8 +89,8 @@ public struct DiskData {
      * @text: the text to encode into a utf8 text file
      * @name: the name this file will be given in disk
      */
-    public init(text: String, name: String) throws {
-        guard let data = text.data(using: .utf8) else {
+    public init(text: String, name: String, encoding: String.Encoding) throws {
+        guard let data = text.data(using: encoding) else {
             throw FileEncodingError.failedToEncodeText
         }
         
@@ -126,8 +126,8 @@ public struct DiskData {
      * Decode the data a UIImage
      * @Returns: decoded image
      */
-    public func text() -> String? {
-        return String(data: data, encoding: .utf8)
+    public func text(encoding: String.Encoding) -> String? {
+        return String(data: data, encoding: encoding)
     }
     
     public func makeFileWrapper() -> FileWrapper {

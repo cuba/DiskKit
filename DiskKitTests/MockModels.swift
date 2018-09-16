@@ -135,7 +135,7 @@ struct MockSubPackage: Packagable {
         self.diskCodableArray = try package.fileArray("disk_codable_list")
         self.image = try package.image("image.jpg")
         self.image2 = try package.image("image.png")
-        self.exampleText = try package.text("example.txt")
+        self.exampleText = try package.text("example.txt", encoding: .utf8)
     }
     
     func mapping(package: Package) throws {
@@ -145,7 +145,7 @@ struct MockSubPackage: Packagable {
         try package.add(diskCodableArray, name: "disk_codable_list")
         try package.add(image, name: "image.jpg", type: .jpg(compressionQuality: 0.5))
         try package.add(image2, name: "image.png", type: .png)
-        try package.add(text: exampleText, name: "example.txt")
+        try package.add(text: exampleText, name: "example.txt", encoding: .utf8)
     }
 }
 

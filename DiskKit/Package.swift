@@ -210,20 +210,20 @@ public class Package {
     
     // MARK: - Get Text
     
-    public func text(_ name: String) throws -> String {
+    public func text(_ name: String, encoding: String.Encoding) throws -> String {
         let diskData: DiskData = try self.diskData(name)
         
-        guard let text = diskData.text() else {
+        guard let text = diskData.text(encoding: encoding) else {
             throw PackageReadError.unableToReadFile
         }
         
         return text
     }
     
-    public func text(_ name: String) throws -> String? {
+    public func text(_ name: String, encoding: String.Encoding) throws -> String? {
         guard let diskData = files.first(where: { $0.fileName == name }) else { return nil }
         
-        guard let text = diskData.text() else {
+        guard let text = diskData.text(encoding: encoding) else {
             throw PackageReadError.unableToReadFile
         }
         
