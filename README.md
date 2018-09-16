@@ -136,13 +136,13 @@ struct TestPackage: Packagable {
         self.subPackage = subPackage
     }
     
-    init(map: PackageMap) throws {
+    init(package: Package) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
         self.subPackage = try.map.file("sub_package")
     }
     
-    func mapping(map: PackageMap) throws {
+    func fill(package: Package) throws {
         try map.add(codable, name: "codable.json")
         try map.add(diskCodable, name: "disk_codable.json")
         try map.add(subPackage, name: "sub_package")
@@ -182,6 +182,7 @@ Packagable supports the following types:
 * `DiskData` arrays (i.e. `[DiskData]`) *These will be stored in auto-generated file names*
 * `UIImage` types
 * `String` types
+* `Data` types
 
 ### Using DiskData
 
