@@ -30,8 +30,13 @@ public class Package {
     
     // MARK: - Add
     
-    public func add(text: String, name: String) throws {
-        let diskData = try DiskData(text: text, name: name)
+    public func add(data: Data, name: String) {
+        let diskData = DiskData(data: data, name: name)
+        add(diskData)
+    }
+    
+    public func add(text: String, name: String, encoding: String.Encoding) throws {
+        let diskData = try DiskData(text: text, name: name, encoding: encoding)
         add(diskData)
     }
     
@@ -102,6 +107,16 @@ public class Package {
         }
         
         directories[name] = package
+    }
+    
+    // MARK: - Get Data
+    
+    public func data(_ name: String) throws -> Data {
+        guard let diskData = files.first(where: { $0.fileName == name }) else {
+            throw PackageReadError.fileNotFound
+        }
+        
+        return diskData.data
     }
     
     // MARK: - Get DiskData
