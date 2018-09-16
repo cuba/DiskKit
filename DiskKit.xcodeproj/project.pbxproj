@@ -70,6 +70,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DA1A8B81214EB526005C3D05 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				DAE483A0214572C800C19A58 /* DiskData.swift */,
+				DA1A8B79214D9E8B005C3D05 /* Package.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
 		DAD0108A214426340038E5A4 = {
 			isa = PBXGroup;
 			children = (
@@ -91,6 +100,7 @@
 		DAD01096214426340038E5A4 /* DiskKit */ = {
 			isa = PBXGroup;
 			children = (
+				DA1A8B81214EB526005C3D05 /* Models */,
 				DAE4834C2144489000C19A58 /* Utilities */,
 				DAE483492144484E00C19A58 /* Extensions */,
 				DAD010FE214427840038E5A4 /* Supporting Files */,
@@ -132,10 +142,8 @@
 			isa = PBXGroup;
 			children = (
 				DAD010FF214427AB0038E5A4 /* Disk.swift */,
-				DAE483A0214572C800C19A58 /* DiskData.swift */,
 				DAE4839E21456C0800C19A58 /* EncodableDisk.swift */,
 				DAE483A321457B9800C19A58 /* PackagableDisk.swift */,
-				DA1A8B79214D9E8B005C3D05 /* Package.swift */,
 			);
 			name = Utilities;
 			sourceTree = "<group>";
