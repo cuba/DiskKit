@@ -50,7 +50,7 @@ public class PackagableDisk {
         return try T(package: package)
     }
     
-    static func packages<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
+    public static func packages<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
         let packageUrls = try Disk.contents(of: directory, path: path)
         let packageNames = packageUrls.map({ $0.lastPathComponent })
         var packages: [T] = []
