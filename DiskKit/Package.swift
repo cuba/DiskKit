@@ -45,7 +45,17 @@ public class Package {
         add(diskData)
     }
     
-    public func add(text: String, name: String, encoding: String.Encoding) throws {
+    public func add(_ file: DiskData) {
+        if let index = files.index(of: file) {
+            files[index] = file
+        } else {
+            files.append(file)
+        }
+    }
+    
+    public func add(text: String?, name: String, encoding: String.Encoding) throws {
+        guard let text = text else { return }
+        
         do {
             let diskData = try DiskData(text: text, name: name, encoding: encoding)
             add(diskData)
@@ -54,7 +64,9 @@ public class Package {
         }
     }
     
-    public func add(_ image: UIImage, name: String, type: ImageFileType) throws {
+    public func add(_ image: UIImage?, name: String, type: ImageFileType) throws {
+        guard let image = image else { return }
+        
         do {
             let diskData = try DiskData(image: image, name: name, type: type)
             add(diskData)
@@ -63,7 +75,9 @@ public class Package {
         }
     }
     
-    public func add<T: Encodable>(_ file: T, name: String) throws {
+    public func add<T: Encodable>(_ file: T?, name: String) throws {
+        guard let file = file else { return }
+        
         do {
             let diskData = try DiskData(file: file, name: name)
             add(diskData)
@@ -72,20 +86,14 @@ public class Package {
         }
     }
     
-    public func add<T: DiskEncodable>(_ file: T, name: String) throws {
+    public func add<T: DiskEncodable>(_ file: T?, name: String) throws {
+        guard let file = file else { return }
+        
         do {
             let diskData = try DiskData(file: file, name: name)
             add(diskData)
         } catch let error {
             throw PackageEncodingError.unableToEncodeFile(cause: error)
-        }
-    }
-    
-    public func add(_ file: DiskData) {
-        if let index = files.index(of: file) {
-            files[index] = file
-        } else {
-            files.append(file)
         }
     }
     
@@ -109,17 +117,19 @@ public class Package {
         directories[name] = package
     }
     
-    public func add(_ fileArray: [DiskData], name: String) throws {
+    public func add(_ diskDataArray: [DiskData], name: String) throws {
         let package = Package()
         
-        for (_, file) in fileArray.enumerated() {
+        for (_, file) in diskDataArray.enumerated() {
             package.add(file)
         }
         
         directories[name] = package
     }
     
-    public func add<T: Packagable>(_ packagable: T, name: String) throws {
+    public func add<T: Packagable>(_ packagable: T?, name: String) throws {
+        guard let packagable = packagable else { return }
+        
         let package = Package()
         try packagable.fill(package: package)
         directories[name] = package
