@@ -23,10 +23,10 @@ class DiskTests: XCTestCase {
     
     func testGivenDiskData_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
-        guard let diskData = try? DiskData(file: testFile, name: fileName) else {
+        guard let diskData = try? DiskData(file: testFile, name: filename) else {
             XCTAssert(false)
             return
         }
@@ -36,7 +36,7 @@ class DiskTests: XCTestCase {
         XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
         
         // Then
-        guard let loadedDiskData = try! Disk.diskData(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedDiskData = try! Disk.diskData(withName: filename, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -82,10 +82,10 @@ class DiskTests: XCTestCase {
     
     func testGivenDiskData_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
-        guard let diskData = try? DiskData(file: testFile, name: fileName) else {
+        guard let diskData = try? DiskData(file: testFile, name: filename) else {
             XCTAssert(false)
             return
         }
@@ -95,7 +95,7 @@ class DiskTests: XCTestCase {
         XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
         
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename, path: "some_folder"))
     }
     
     func testRemovingPathInDirectory() {

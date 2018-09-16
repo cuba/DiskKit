@@ -47,11 +47,11 @@ public extension UIImage {
 
 public struct DiskData {
     
-    public let fileName: String
+    public let filename: String
     public let data: Data
     
     public init(data: Data, name: String) {
-        self.fileName = name
+        self.filename = name
         self.data = data
     }
     
@@ -132,13 +132,13 @@ public struct DiskData {
     
     public func makeFileWrapper() -> FileWrapper {
         let fileWrapper = FileWrapper(regularFileWithContents: data)
-        fileWrapper.filename = fileName
+        fileWrapper.filename = filename
         return fileWrapper
     }
 }
 
 extension DiskData: Equatable {
     public static func == (lhs: DiskData, rhs: DiskData) -> Bool {
-        return lhs.fileName == rhs.fileName
+        return lhs.filename == rhs.filename
     }
 }

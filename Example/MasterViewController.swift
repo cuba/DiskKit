@@ -152,7 +152,7 @@ extension MasterViewController: DetailViewControllerDelegate {
         
         do {
             article.isModified = false
-            let url = try EncodableDisk.store(article, to: .documents, as: article.fileName, path: subfolder)
+            let url = try EncodableDisk.store(article, to: .documents, as: article.filename, path: subfolder)
             print(url)
         } catch let error {
             // TODO: Show error

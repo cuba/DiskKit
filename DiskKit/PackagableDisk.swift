@@ -8,20 +8,6 @@
 
 import Foundation
 
-public protocol Packagable {
-    init(package: Package) throws
-    func fill(package: Package) throws
-}
-
-public extension Packagable {
-    
-    public func makeFileWrapper() throws -> FileWrapper {
-        let package = Package()
-        try fill(package: package)
-        return try package.makeFileWrapper()
-    }
-}
-
 public class PackagableDisk {
     
     /**
@@ -31,7 +17,7 @@ public class PackagableDisk {
      * @packageName: what to name the package where the folder will be stored
      */
     public static func store(_ package: Packagable, to directory: Disk.Directory, withName packageName: String, path: String? = nil) throws -> URL {
-        let fileWrapper = try package.makeFileWrapper()
+        let fileWrapper = try package.makeFileWrapper(filename: packageName)
         let packageUrl = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
         try fileWrapper.write(to: packageUrl, options: [], originalContentsURL: nil)
         return packageUrl

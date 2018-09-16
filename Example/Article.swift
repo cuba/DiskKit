@@ -17,12 +17,12 @@ struct Article: Codable {
     var dateUpdated: Date
     var body: String
     
-    var fileName: String {
+    var filename: String {
         return [uuid, Article.fileExtension].joined(separator: ".")
     }
     
     var displayFileName: String {
-        var components: [String] = [fileName]
+        var components: [String] = [filename]
         
         if isModified {
             components.append("(modified)")

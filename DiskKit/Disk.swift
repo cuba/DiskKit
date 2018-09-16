@@ -51,23 +51,23 @@ public class Disk {
             }
         }
         
-        public func makeUrl(path: String? = nil, fileName: String? = nil) -> URL {
+        public func makeUrl(path: String? = nil, filename: String? = nil) -> URL {
             var url = baseUrl
             
             if let path = path {
                 url = url.appendingPathComponent(path, isDirectory: true)
             }
             
-            if let fileName = fileName {
-                url = url.appendingPathComponent(fileName, isDirectory: false)
+            if let filename = filename {
+                url = url.appendingPathComponent(filename, isDirectory: false)
             }
             
             return url
         }
         
-        public func makeUrl(paths: [String], fileName: String? = nil) -> URL {
+        public func makeUrl(paths: [String], filename: String? = nil) -> URL {
             let path = paths.joined(separator: "/")
-            return makeUrl(path: path, fileName: fileName)
+            return makeUrl(path: path, filename: filename)
         }
     }
     
@@ -77,15 +77,15 @@ public class Disk {
      * Save the disk data to the directory specified
      */
     public static func store(_ diskData: DiskData, to directory: Directory, path: String? = nil) throws -> URL {
-        return try store(fileData: diskData.data, to: directory, fileName: diskData.fileName, path: path)
+        return try store(fileData: diskData.data, to: directory, filename: diskData.filename, path: path)
     }
 
     /**
      * Retrieve the disk data in the directory specified with the given file name
      */
-    public static func diskData(withName fileName: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
-        guard let data = fileData(withName: fileName, in: directory, path: path) else { return nil }
-        return DiskData(data: data, name: fileName)
+    public static func diskData(withName filename: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
+        guard let data = fileData(withName: filename, in: directory, path: path) else { return nil }
+        return DiskData(data: data, name: filename)
     }
     
     /**
@@ -95,8 +95,8 @@ public class Disk {
         let urls = try contents(of: directory, path: path)
         
         let diskDatas: [DiskData] = urls.compactMap({
-            let fileName = $0.lastPathComponent
-            return try? self.diskData(withName: fileName, in: directory, path: path)!
+            let filename = $0.lastPathComponent
+            return try? self.diskData(withName: filename, in: directory, path: path)!
         })
         
         return diskDatas
@@ -107,8 +107,8 @@ public class Disk {
     /**
      * Stores a file in the directoy specified. Replaces any file with the same name.
      */
-    @discardableResult public static func store(fileData data: Data, to directory: Directory, fileName: String, path: String? = nil) throws -> URL {
-        let url = directory.makeUrl(path: path, fileName: fileName)
+    @discardableResult public static func store(fileData data: Data, to directory: Directory, filename: String, path: String? = nil) throws -> URL {
+        let url = directory.makeUrl(path: path, filename: filename)
         try store(fileData: data, to: url)
         return url
     }
@@ -116,8 +116,8 @@ public class Disk {
     /**
      * Returns a file with the given file name in the specified directory.
      */
-    public static func fileData(withName fileName: String, in directory: Directory, path: String? = nil) -> Data? {
-        let url = directory.makeUrl(path: path, fileName: fileName)
+    public static func fileData(withName filename: String, in directory: Directory, path: String? = nil) -> Data? {
+        let url = directory.makeUrl(path: path, filename: filename)
         return fileData(at: url)
     }
     
@@ -132,16 +132,16 @@ public class Disk {
     /**
      * Remove specified file from specified directory
      */
-    public static func remove(fileName: String, from directory: Directory, path: String? = nil) {
-        let url = directory.makeUrl(path: path, fileName: fileName)
+    public static func remove(filename: String, from directory: Directory, path: String? = nil) {
+        let url = directory.makeUrl(path: path, filename: filename)
         removeFile(at: url)
     }
     
     /**
      * Returns BOOL indicating whether file exists at specified directory with specified file name
      */
-    public static func fileExists(in directory: Directory, withFileName fileName: String, path: String? = nil) -> Bool {
-        let url = directory.makeUrl(path: path, fileName: fileName)
+    public static func fileExists(in directory: Directory, withFileName filename: String, path: String? = nil) -> Bool {
+        let url = directory.makeUrl(path: path, filename: filename)
         return FileManager.default.fileExists(atPath: url.path)
     }
     

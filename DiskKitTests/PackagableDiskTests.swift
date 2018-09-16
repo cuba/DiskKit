@@ -23,16 +23,16 @@ class PackagableDiskTests: XCTestCase {
     
     func testGivenPackagableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
-        let fileName = "example.package"
+        let filename = "example.package"
         let testFile = MockPackage(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: fileName, path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: filename, path: "some_folder"))
         
         // Then
         do {
-            guard let loadedFile: MockPackage = try PackagableDisk.package(withName: fileName, in: .documents, path: "some_folder") else {
+            guard let loadedFile: MockPackage = try PackagableDisk.package(withName: filename, in: .documents, path: "some_folder") else {
                 XCTAssert(false)
                 return
             }
@@ -74,14 +74,14 @@ class PackagableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
-        let fileName = "example.package"
+        let filename = "example.package"
         let testFile = MockPackage(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: fileName))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: filename))
         
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename))
         
     }
 }

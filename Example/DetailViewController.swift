@@ -61,7 +61,7 @@ class DetailViewController: UIViewController {
     
     func configure(with article: Article?) {
         self.article = article
-        title = article?.fileName ?? "New Article"
+        title = article?.filename ?? "New Article"
         textView.text = article?.body
     }
     

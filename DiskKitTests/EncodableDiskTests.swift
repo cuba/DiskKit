@@ -23,15 +23,15 @@ class EncodableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
         
         // Then
-        guard let loadedFile: MockCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockCodable = try! EncodableDisk.file(withName: filename, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -62,27 +62,27 @@ class EncodableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "some_folder"))
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename, path: "some_folder"))
     }
     
     func testGivenDiskCodableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockDiskCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
         
         // Then
-        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: filename, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -93,15 +93,15 @@ class EncodableDiskTests: XCTestCase {
     
     func testGivenDiskCodableFile_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockDiskCodable(id: "ABC")
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: fileName, path: "some_folder"))
+        XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
         
         // Then
-        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: fileName, in: .documents, path: "some_folder") else {
+        guard let loadedFile: MockDiskCodable = try! EncodableDisk.file(withName: filename, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -112,7 +112,7 @@ class EncodableDiskTests: XCTestCase {
     
     func testGivenDiskCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
-        let fileName = "example.json"
+        let filename = "example.json"
         let testFile = MockDiskCodable(id: "ABC")
         
         // When
@@ -120,6 +120,6 @@ class EncodableDiskTests: XCTestCase {
         XCTAssertNoThrow(try EncodableDisk.store(testFile, to: .documents, as: "example.json", path: "some_folder"))
         
         // Then
-        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: fileName, path: "some_folder"))
+        XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename, path: "some_folder"))
     }
 }
