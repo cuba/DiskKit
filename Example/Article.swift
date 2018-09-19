@@ -9,41 +9,58 @@
 import Foundation
 import DiskKit
 
-struct Article: Codable {
-    static let fileExtension = "json"
+struct Article: Packagable {
+    static let baseUrl = Disk.Directory.documents.makeUrl()
     
-    var uuid: String = UUID().uuidString
+    var details: ArticleDetails
+    var author: Author
+    
+    init() {
+        self.details = ArticleDetails(body: "")
+        self.author = Author(name: "John Doe")
+    }
+    
+    init(package: Package) throws {
+        details = try package.file("article.json")
+        author = try package.file("author.json")
+    }
+    
+    func fill(package: Package) throws {
+        try package.add(details, name: "article.json")
+        try package.add(author, name: "author.json")
+    }
+    
+    func save(to url: URL, from originalUrl: URL?) throws {
+        try PackagableDisk.store(self, to: url, originalUrl: originalUrl)
+    }
+    
+    static func load(from url: URL) throws -> Article? {
+        return try PackagableDisk.package(at: url)
+    }
+    
+    static func loadAll(from url: URL) throws -> [Article] {
+        return try PackagableDisk.packages(in: url)
+    }
+}
+
+struct ArticleDetails: Codable {
+    
     var dateCreated: Date
     var dateUpdated: Date
     var body: String
-    
-    var filename: String {
-        return [uuid, Article.fileExtension].joined(separator: ".")
-    }
-    
-    var displayFileName: String {
-        var components: [String] = [filename]
-        
-        if isModified {
-            components.append("(modified)")
-        }
-        
-        return components.joined(separator: " ")
-    }
-    
-    var isModified: Bool
     
     init(body: String) {
         let date = Date()
         self.dateCreated = date
         self.dateUpdated = date
         self.body = body
-        isModified = true
     }
 }
 
-extension Article: Equatable {
-    public static func == (lhs: Article, rhs: Article) -> Bool {
-        return lhs.uuid == rhs.uuid
+struct Author: Codable {
+    var name: String
+    
+    init(name: String) {
+        self.name = name
     }
 }

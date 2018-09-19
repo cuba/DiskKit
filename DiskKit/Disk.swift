@@ -141,8 +141,16 @@ public class Disk {
      * Returns BOOL indicating whether file exists at specified directory with specified file name
      */
     public static func fileExists(in directory: Directory, withFileName filename: String, path: String? = nil) -> Bool {
-        let url = directory.makeUrl(path: path, filename: filename)
+        let url = directory.makeUrl(paths: [path, filename].compactMap({ $0 }))
         return FileManager.default.fileExists(atPath: url.path)
+    }
+    
+    /**
+     * Returns BOOL indicating whether file exists at specified directory with specified file name
+     */
+    public static func pathExists(_ path: String, in directory: Directory) -> Bool {
+        let url = directory.makeUrl(path: path)
+        return pathExists(at: url)
     }
     
     // MARK: - Folders
@@ -217,6 +225,19 @@ public class Disk {
      */
     public static func fileExists(at url: URL) -> Bool {
         return FileManager.default.fileExists(atPath: url.path)
+    }
+    
+    /**
+     * Checks if the directory exists.
+     */
+    public static func pathExists(at url: URL) -> Bool {
+        var isDirectory: ObjCBool = false
+        
+        if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDirectory) {
+            return isDirectory.boolValue
+        } else {
+            return false
+        }
     }
     
     /**

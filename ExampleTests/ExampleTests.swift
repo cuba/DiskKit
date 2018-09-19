@@ -13,24 +13,37 @@ class ExampleTests: XCTestCase {
     
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        DiskUtility.clearDocuments()
     }
     
     override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+        DiskUtility.clearDocuments()
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+    func testSavingPackages() {
+        // Given
+        let filename = "example.package"
+        var article = Article()
+        article.details.body = "Some body"
+        article.author.name = "John Smith"
+        let baseUrl = Article.baseUrl
+        let fileUrl = baseUrl.appendingPathComponent(filename)
+        
+        // When
+        XCTAssertNoThrow(try article.save(to: fileUrl, from: nil))
+        
+        // Then
+        do {
+            let loaded = try Article.loadAll(from: baseUrl)
+            XCTAssert(loaded.count == 1)
+            
+            if loaded.count == 1 {
+                XCTAssert(article.details.body == loaded[0].details.body)
+                XCTAssert(article.author.name == loaded[0].author.name)
+            }
+        } catch {
+            XCTAssert(false)
         }
     }
-    
 }

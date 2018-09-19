@@ -102,4 +102,20 @@ class DiskTests: XCTestCase {
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
         XCTAssertNoThrow(try Disk.remove(path: "some_folder", in: .documents))
     }
+    
+    func testWhenDirectoryExists_PathExists_ReturnsTrue() {
+        // Given
+        let path = "some_path"
+        
+        // When
+        XCTAssertNoThrow(try Disk.create(path: path, in: .documents))
+        
+        // Then
+        XCTAssertTrue(Disk.pathExists(path, in: .documents))
+    }
+    
+    func testWhenDirectoryDoesNotExist_PathExists_ReturnsTrue() {
+        // Then
+        XCTAssertFalse(Disk.pathExists("some_path", in: .documents))
+    }
 }

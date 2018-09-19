@@ -28,7 +28,7 @@ class PackagableDiskTests: XCTestCase {
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: filename, path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
         
         // Then
         do {
@@ -53,8 +53,8 @@ class PackagableDiskTests: XCTestCase {
 
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, withName: "example_2.package", path: "some_folder"))
-        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, withName: "example_1.package", path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, as: "example_2.package", path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, as: "example_1.package", path: "some_folder"))
 
         // Then
         do {
@@ -78,10 +78,24 @@ class PackagableDiskTests: XCTestCase {
         let testFile = MockPackage(id: "ABC")
         
         // When
-        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, withName: filename))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, as: filename))
         
         // Then
         XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename))
         
+    }
+    
+    func testGivenCodableFile_WhenSaveFile_CanOverwriteFile() {
+        // Given
+        let filename = "example.package"
+        var testFile = MockPackage(id: "ABC")
+        
+        // When
+        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
+        testFile.codable.id = UUID().uuidString
+        
+        // Then
+        XCTAssertNoThrow(try PackagableDisk.store(testFile, to: .documents, as: filename, path: "some_folder"))
     }
 }

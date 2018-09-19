@@ -10,29 +10,18 @@ import UIKit
 import DiskKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         
-        let splitViewController = UISplitViewController()
-        let masterViewController = MasterViewController()
-        let detailViewController = DetailViewController()
-        detailViewController.delegate = masterViewController
-        
-        splitViewController.viewControllers = [
-            UINavigationController(rootViewController: masterViewController),
-            UINavigationController(rootViewController: detailViewController)
-        ]
-        
+        let viewController = DocumentBrowserViewController()
         window = UIWindow(frame: UIScreen.main.bounds)
-        window?.rootViewController = splitViewController
+        window?.rootViewController = viewController
         window?.makeKeyAndVisible()
         
-        masterViewController.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem
-        splitViewController.delegate = self
         return true
     }
 
@@ -57,20 +46,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UISplitViewControllerDele
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-    // MARK: - Split view
-
-    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary secondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
-        guard let navigationController = secondaryViewController as? UINavigationController else { return false }
-        guard let detailController = navigationController.topViewController as? DetailViewController else { return false }
+    
+    func application(_ app: UIApplication, open inputURL: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        // Ensure the URL is a file URL
+        guard inputURL.isFileURL else { return false }
         
-        if detailController.article == nil {
-            // Return true to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
-            return true
-        } else {
-            return false
+        // Reveal / import the document at the URL
+        guard let documentBrowserViewController = window?.rootViewController as? DocumentBrowserViewController else { return false }
+        
+        documentBrowserViewController.revealDocument(at: inputURL, importIfNeeded: true) { (revealedDocumentURL, error) in
+            if let error = error {
+                // Handle the error appropriately
+                print("Failed to reveal the document at URL \(inputURL) with error: '\(error)'")
+                return
+            }
+            
+            // Present the Document View Controller for the revealed URL
+            documentBrowserViewController.presentDocument(at: revealedDocumentURL!)
         }
+        
+        return true
     }
-
 }
 

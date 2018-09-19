@@ -1,5 +1,5 @@
 //
-//  DetailViewController.swift
+//  ArticleViewController.swift
 //  Example
 //
 //  Created by Jacob Sikorski on 2018-09-08.
@@ -9,28 +9,28 @@
 import UIKit
 import DiskKit
 
-protocol DetailViewControllerDelegate {
-    func detailViewController(_ detailViewController: DetailViewController, requiresSaveForArticle article: Article)
-    func detailViewController(_ detailViewController: DetailViewController, didModifyArticle article: Article)
+protocol ArticleModuleDelegate {
+    func articleModuleDidSave(_ article: Article)
+    func articleModuleDidCancel()
 }
 
-class DetailViewController: UIViewController {
+class ArticleViewController: UIViewController {
     lazy var textView: UITextView = {
         let textView = UITextView(frame: CGRect.zero)
         textView.delegate = self
         return textView
     }()
     
-    var article: Article?
-    var delegate: DetailViewControllerDelegate?
+    let url: URL
+    var article: Article
+    var delegate: ArticleModuleDelegate?
     
-    init() {
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    init(article: Article) {
+    init(article: Article, url: URL) {
+        self.url = url
         self.article = article
         super.init(nibName: nil, bundle: nil)
+        
+        textView.text = article.details.body
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -41,8 +41,8 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
         setupLayout()
         view.backgroundColor = UIColor.groupTableViewBackground
-        configure(with: self.article)
         
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(tappedCancel))
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(tappedSave))
         
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
@@ -59,12 +59,6 @@ class DetailViewController: UIViewController {
         textView.resignFirstResponder()
     }
     
-    func configure(with article: Article?) {
-        self.article = article
-        title = article?.filename ?? "New Article"
-        textView.text = article?.body
-    }
-    
     private func setupLayout() {
         view.addSubview(textView)
         textView.translatesAutoresizingMaskIntoConstraints = false
@@ -77,14 +71,23 @@ class DetailViewController: UIViewController {
     
     @objc private func tappedSave() {
         textView.resignFirstResponder()
-        guard let article = article else { return }
-        delegate?.detailViewController(self, requiresSaveForArticle: article)
+        
+        do {
+            try article.save(to: url, from: url)
+            delegate?.articleModuleDidSave(article)
+        } catch let error {
+            print(error)
+        }
+    }
+    
+    @objc func tappedCancel() {
+        delegate?.articleModuleDidCancel()
     }
 }
 
 // MARK: - Keyboard
 
-extension DetailViewController {
+extension ArticleViewController {
     
     @objc private func keyboardWillShow(notification: NSNotification){
         //give room at the bottom of the scroll view, so it doesn't cover up anything the user needs to tap
@@ -105,17 +108,14 @@ extension DetailViewController {
 
 // MARK: - UITextViewDelegate
 
-extension DetailViewController: UITextViewDelegate {
+extension ArticleViewController: UITextViewDelegate {
     func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
+        self.article.details.body = textView.text
         return true
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        var article = self.article ?? Article(body: "")
-        article.body = textView.text
-        article.isModified = true
-        self.article = article
-        delegate?.detailViewController(self, didModifyArticle: article)
+        self.article.details.body = textView.text
     }
 }
 
