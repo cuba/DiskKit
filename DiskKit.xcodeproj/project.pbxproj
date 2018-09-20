@@ -15,6 +15,10 @@
 		DA1A8B7E214DAD8A005C3D05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */; };
 		DA1A8B83214EED84005C3D05 /* Packagable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B82214EED84005C3D05 /* Packagable.swift */; };
 		DA1A8B85214EEDA3005C3D05 /* DiskCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B84214EEDA3005C3D05 /* DiskCodable.swift */; };
+		DA1A8BFD215330BA005C3D05 /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BF9215330BA005C3D05 /* Cartfile */; };
+		DA1A8BFE215330BA005C3D05 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BFA215330BA005C3D05 /* LICENSE */; };
+		DA1A8BFF215330BA005C3D05 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BFB215330BA005C3D05 /* README.md */; };
+		DA1A8C00215330BA005C3D05 /* Cartfile.resolved in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BFC215330BA005C3D05 /* Cartfile.resolved */; };
 		DAD0109E214426350038E5A4 /* DiskKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAD01094214426340038E5A4 /* DiskKit.framework */; };
 		DAD010A5214426350038E5A4 /* DiskKit.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD01097214426340038E5A4 /* DiskKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DAD01100214427AB0038E5A4 /* Disk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD010FF214427AB0038E5A4 /* Disk.swift */; };
@@ -43,6 +47,10 @@
 		DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DA1A8B82214EED84005C3D05 /* Packagable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packagable.swift; sourceTree = "<group>"; };
 		DA1A8B84214EEDA3005C3D05 /* DiskCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskCodable.swift; sourceTree = "<group>"; };
+		DA1A8BF9215330BA005C3D05 /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = SOURCE_ROOT; };
+		DA1A8BFA215330BA005C3D05 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
+		DA1A8BFB215330BA005C3D05 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		DA1A8BFC215330BA005C3D05 /* Cartfile.resolved */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile.resolved; sourceTree = SOURCE_ROOT; };
 		DAD01094214426340038E5A4 /* DiskKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DiskKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAD01097214426340038E5A4 /* DiskKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DiskKit.h; sourceTree = "<group>"; };
 		DAD01098214426350038E5A4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -130,6 +138,10 @@
 		DAD010FE214427840038E5A4 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				DA1A8BF9215330BA005C3D05 /* Cartfile */,
+				DA1A8BFC215330BA005C3D05 /* Cartfile.resolved */,
+				DA1A8BFA215330BA005C3D05 /* LICENSE */,
+				DA1A8BFB215330BA005C3D05 /* README.md */,
 				DAD01097214426340038E5A4 /* DiskKit.h */,
 				DAD01098214426350038E5A4 /* Info.plist */,
 			);
@@ -246,6 +258,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA1A8BFF215330BA005C3D05 /* README.md in Resources */,
+				DA1A8C00215330BA005C3D05 /* Cartfile.resolved in Resources */,
+				DA1A8BFE215330BA005C3D05 /* LICENSE in Resources */,
+				DA1A8BFD215330BA005C3D05 /* Cartfile in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
