@@ -13,12 +13,14 @@ public class PackagableDisk {
     /**
      * Store an package to the specified directory on disk
      * @package: the package to store
-     * @directory: where to store the struct
-     * @packageName: what to name the package where the folder will be stored
+     * @to: the directory where to store the package
+     * @as: the name to store the package as
+     * @path: the path in the directory to store the file in. The filename will be appended to this path.
+     * @originalUrl: the original url of the package.
      */
-    public static func store(_ package: Packagable, to directory: Disk.Directory, as filename: String, path: String? = nil) throws -> URL {
+    public static func store(_ package: Packagable, to directory: Disk.Directory, as filename: String, path: String? = nil, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws -> URL {
         let url = directory.makeUrl(path: path, filename: filename)
-        try store(package, to: url, originalUrl: url)
+        try store(package, to: url, originalUrl: originalUrl)
         return url
     }
     
@@ -50,10 +52,10 @@ public class PackagableDisk {
      * @url: where to store the struct
      * @orignalUrl: the original location of the package (you should provide this if you're updating an existing package)
      */
-    public static func store(_ package: Packagable, to url: URL, originalUrl: URL?) throws {
+    public static func store(_ package: Packagable, to url: URL, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws {
         let filename = url.lastPathComponent
         let fileWrapper = try package.makeFileWrapper(filename: filename)
-        try fileWrapper.write(to: url, options: [.withNameUpdating, .atomic], originalContentsURL: originalUrl)
+        try fileWrapper.write(to: url, options: options, originalContentsURL: originalUrl)
         
         #if DEBUG
         if originalUrl != nil {
@@ -103,18 +105,15 @@ public class PackagableDisk {
      * @Returns: decoded package
      */
     public static func packages(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [Package] {
-        let resourceKeys: [URLResourceKey] = []
+        let resourceKeys: [URLResourceKey] = [.isPackageKey]
         guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: resourceKeys, options: options) else { return [] }
         var packages: [Package] = []
-        var lastPackageUrl: URL?
         
         for case let fileURL as URL in enumerator {
             do {
-                guard lastPackageUrl == nil || !fileURL.absoluteString.hasPrefix(lastPackageUrl!.absoluteString) else { continue }
-                // let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
+                let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
+                guard resourceValues.isPackage ?? false else { continue }
                 guard let package = try package(at: fileURL) else { continue }
-                
-                lastPackageUrl = fileURL
                 packages.append(package)
             } catch let error {
                 print(error)

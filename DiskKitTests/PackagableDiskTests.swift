@@ -52,9 +52,9 @@ class PackagableDiskTests: XCTestCase {
         ]
 
         // When
-        XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
+        XCTAssertNoThrow(try Disk.create(path: "some_folder/sub_folder", in: .documents))
         XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, as: "example_2.package", path: "some_folder"))
-        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, as: "example_1.package", path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, as: "example_1.package", path: "some_folder/sub_folder"))
 
         // Then
         do {

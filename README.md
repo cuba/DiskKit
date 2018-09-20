@@ -84,11 +84,11 @@ DiskCodable gives you some extra flexability with the types of files you can sto
 Store a single file like this:
 
 ```swift
-let fileName = "example.json"
+let filename = "example.json"
 let testFile = TestCodable(id: "ABC")
 
 do {
-  EncodableDisk.store(testFile, to: .documents, as: fileName)
+  EncodableDisk.store(testFile, to: .documents, as: filename)
 } catch {
   // Handle error
 }
@@ -101,7 +101,7 @@ You can load a single file like this:
 
 ```swift
 do {
-  let loadedFile: TestCodable = try EncodableDisk.file(withName: fileName, in: .documents)
+  let loadedFile: TestCodable = try EncodableDisk.file(withName: filename, in: .documents)
 } catch {
   // Handle error
 }
@@ -150,23 +150,37 @@ struct TestPackage: Packagable {
 }
 ```
 
+#### Saving Packages
+
 ```swift
 let testFile = TestPackage(
   codable: TestCodable(id: "CODABLE_ABC"),
   diskCodable: TestDiskCodable(id: "DISK_CODABLE_ABC")
 )
 
-let fileName = "example.package"
+let filename = "example.package"
 
 do {
-  try PackagableDisk.store(testFile, to: .documents, withName: fileName)
+  try PackagableDisk.store(testFile, to: .documents, as: filename)
 } catch {
   // Handle error
 }
 ```
 
+##### Loading packages
+
+```swift
+
+do {
+    let url = Disk.Directory.documents.
+    let package: TestPackage = try PackagableDisk.packagable(in .documents, withName: filename)
+} catch {
+    // Handle error
+}
+```
+
 **Note:**
-You may provide additional information about your package type (and extension) in your applications Info.plist file.
+You need provide additional information about your package type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
 #### PackagableDisk supported types
@@ -191,9 +205,9 @@ DiskData is a helper class that lets you parse your files after retrieving them.
 **Creating DiskData files**
 
 ```swift
-let fileName = "example.json"
+let filename = "example.json"
 let testFile = TestCodable(id: "ABC")
-let diskData = try DiskData(file: testFile, name: fileName)
+let diskData = try DiskData(file: testFile, name: filename)
 ```
 
 `DiskData` supports both `Codable` and `DiskCodable` files.
@@ -208,7 +222,7 @@ try Disk.store(diskData, to: .documents, path: "some_folder")
 **Loading DiskData files:**
 
 ```swift
-let loadedDiskData = try Disk.diskData(withName: fileName, in: .documents, path: "some_folder")
+let loadedDiskData = try Disk.diskData(withName: filename, in: .documents, path: "some_folder")
 ```
 
 **Loading multiple DiskData files:**
