@@ -183,6 +183,8 @@ do {
 You need provide additional information about your package type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
+Without this additional information, your package will not be found.
+
 #### PackagableDisk supported types
 
 Packagable supports the following types:
