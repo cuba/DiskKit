@@ -28,9 +28,9 @@ public class PackagableDisk {
      * @directory: directory where package data is stored
      * @Returns: decoded package
      */
-    public static func packages<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
+    public static func packagables<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
         let url = directory.makeUrl(path: path)
-        return try packages(in: url)
+        return try packagables(in: url)
     }
     
     /**
@@ -39,9 +39,9 @@ public class PackagableDisk {
      * @directory: directory where package data is stored
      * @Returns: decoded package
      */
-    public static func package<T: Packagable>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
+    public static func packagable<T: Packagable>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
         let url = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
-        return try package(at: url)
+        return try packagable(at: url)
     }
     
     /**
@@ -65,26 +65,54 @@ public class PackagableDisk {
     }
     
     /**
-     * Retrieve and convert a packages from a folder on disk
-     * @packageName: name of the package where folder is stored
+     * Retrieve and convert a packagables from a folder on disk
      * @url: url where package data is stored
      * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
      * @Returns: decoded package
      */
-    public static func packages<T: Packagable>(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [T] {
+    public static func packagables<T: Packagable>(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [T] {
+        var packagables: [T] = []
+        
+        for package in try packages(in: url, options: options) {
+            do {
+                let packagable = try T(package: package)
+                packagables.append(packagable)
+            } catch let error {
+                print(error)
+                // TODO: Handle this?
+            }
+        }
+        
+        return packagables
+    }
+    
+    /**
+     * Retrieve and convert a packagabe from a folder on disk
+     * @url: url where package data is stored
+     * @Returns: decoded package
+     */
+    public static func packagable<T: Packagable>(at url: URL) throws -> T? {
+        guard let package = try package(at: url) else { return nil }
+        return try T(package: package)
+    }
+    
+    /**
+     * Retrieve and convert a packages from a folder on disk
+     * @url: url where package data is stored
+     * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
+     * @Returns: decoded package
+     */
+    public static func packages(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [Package] {
         let resourceKeys: [URLResourceKey] = []
         guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: resourceKeys, options: options) else { return [] }
-        var packages: [T] = []
+        var packages: [Package] = []
         var lastPackageUrl: URL?
         
         for case let fileURL as URL in enumerator {
             do {
                 guard lastPackageUrl == nil || !fileURL.absoluteString.hasPrefix(lastPackageUrl!.absoluteString) else { continue }
                 // let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
-                
-                guard let package: T = try package(at: fileURL) else {
-                    continue
-                }
+                guard let package = try package(at: fileURL) else { continue }
                 
                 lastPackageUrl = fileURL
                 packages.append(package)
@@ -99,11 +127,10 @@ public class PackagableDisk {
     
     /**
      * Retrieve and convert a package from a folder on disk
-     * @packageName: name of the package where folder is stored
      * @url: url where package data is stored
      * @Returns: decoded package
      */
-    public static func package<T: Packagable>(at url: URL) throws -> T? {
+    public static func package(at url: URL) throws -> Package? {
         let fileWrapper: FileWrapper
         
         do {
@@ -116,7 +143,6 @@ public class PackagableDisk {
             throw PackageDecodingError.notFolder
         }
         
-        let package = try Package(fileWrapper, savedUrl: url)
-        return try T(package: package)
+        return try Package(fileWrapper, savedUrl: url)
     }
 }

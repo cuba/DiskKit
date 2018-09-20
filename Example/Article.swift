@@ -35,11 +35,11 @@ struct Article: Packagable {
     }
     
     static func load(from url: URL) throws -> Article? {
-        return try PackagableDisk.package(at: url)
+        return try PackagableDisk.packagable(at: url)
     }
     
     static func loadAll(from url: URL) throws -> [Article] {
-        return try PackagableDisk.packages(in: url)
+        return try PackagableDisk.packagables(in: url)
     }
 }
 

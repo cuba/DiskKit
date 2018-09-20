@@ -32,7 +32,7 @@ class PackagableDiskTests: XCTestCase {
         
         // Then
         do {
-            guard let loadedFile: MockPackage = try PackagableDisk.package(withName: filename, in: .documents, path: "some_folder") else {
+            guard let loadedFile: MockPackage = try PackagableDisk.packagable(withName: filename, in: .documents, path: "some_folder") else {
                 XCTAssert(false)
                 return
             }
@@ -58,7 +58,7 @@ class PackagableDiskTests: XCTestCase {
 
         // Then
         do {
-            let loadedFiles: [MockPackage] = try PackagableDisk.packages(in: .documents, path: "some_folder")
+            let loadedFiles: [MockPackage] = try PackagableDisk.packagables(in: .documents, path: "some_folder")
             
             guard loadedFiles.count == 2 else {
                 XCTAssert(false)
