@@ -160,12 +160,7 @@ public class Disk {
      */
     @discardableResult public static func clear(_ directory: Directory, path: String? = nil) throws -> URL {
         let url = directory.makeUrl(path: path)
-        let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
-        
-        for fileUrl in contents {
-            try FileManager.default.removeItem(at: fileUrl)
-        }
-        
+        try clearContentsOf(directory: url)
         return url
     }
     
@@ -270,5 +265,16 @@ public class Disk {
     public static func fileData(at url: URL) -> Data? {
         let data = FileManager.default.contents(atPath: url.path)
         return data
+    }
+    
+    /**
+     * Remove all files at specified directory
+     */
+    public static func clearContentsOf(directory url: URL) throws {
+        let contents = try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [])
+        
+        for fileUrl in contents {
+            try FileManager.default.removeItem(at: fileUrl)
+        }
     }
 }
