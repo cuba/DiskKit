@@ -155,3 +155,16 @@ extension MockPackage: Equatable {
         return lhs.codable == rhs.codable && lhs.diskCodable == rhs.diskCodable
     }
 }
+
+class MockMigration: Migration {
+    var uniqueName: String
+    var numberOfTimesRan = 0
+    
+    func migrate() {
+        numberOfTimesRan += 1
+    }
+    
+    init(uniqueName: String) {
+        self.uniqueName = uniqueName
+    }
+}

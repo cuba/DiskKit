@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA04EF642156B7D100B29EDE /* Migration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA04EF632156B7D100B29EDE /* Migration.swift */; };
+		DA04EF662156B7E500B29EDE /* Migrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA04EF652156B7E500B29EDE /* Migrator.swift */; };
+		DA04EF682156BB5D00B29EDE /* MigratorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA04EF672156BB5D00B29EDE /* MigratorTests.swift */; };
 		DA1A8B4E214761B3005C3D05 /* MockModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B4D214761B3005C3D05 /* MockModels.swift */; };
 		DA1A8B5521477369005C3D05 /* EncodableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */; };
 		DA1A8B572147737D005C3D05 /* PackagableDiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */; };
@@ -39,6 +42,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DA04EF632156B7D100B29EDE /* Migration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migration.swift; sourceTree = "<group>"; };
+		DA04EF652156B7E500B29EDE /* Migrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Migrator.swift; sourceTree = "<group>"; };
+		DA04EF672156BB5D00B29EDE /* MigratorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigratorTests.swift; sourceTree = "<group>"; };
 		DA1A8B4D214761B3005C3D05 /* MockModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockModels.swift; sourceTree = "<group>"; };
 		DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableDiskTests.swift; sourceTree = "<group>"; };
 		DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagableDiskTests.swift; sourceTree = "<group>"; };
@@ -89,6 +95,7 @@
 				DAE483A0214572C800C19A58 /* DiskData.swift */,
 				DA1A8B79214D9E8B005C3D05 /* Package.swift */,
 				DA1A8B82214EED84005C3D05 /* Packagable.swift */,
+				DA04EF632156B7D100B29EDE /* Migration.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -129,6 +136,7 @@
 				DA1A8B5A214773BE005C3D05 /* DiskTests.swift */,
 				DA1A8B5421477369005C3D05 /* EncodableDiskTests.swift */,
 				DA1A8B562147737D005C3D05 /* PackagableDiskTests.swift */,
+				DA04EF672156BB5D00B29EDE /* MigratorTests.swift */,
 				DA1A8B4D214761B3005C3D05 /* MockModels.swift */,
 				DAD010A4214426350038E5A4 /* Info.plist */,
 			);
@@ -161,6 +169,7 @@
 			children = (
 				DAD010FF214427AB0038E5A4 /* Disk.swift */,
 				DAE4839E21456C0800C19A58 /* EncodableDisk.swift */,
+				DA04EF652156B7E500B29EDE /* Migrator.swift */,
 				DAE483A321457B9800C19A58 /* PackagableDisk.swift */,
 			);
 			name = Utilities;
@@ -288,6 +297,8 @@
 				DAE483A1214572C800C19A58 /* DiskData.swift in Sources */,
 				DA1A8B83214EED84005C3D05 /* Packagable.swift in Sources */,
 				DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */,
+				DA04EF662156B7E500B29EDE /* Migrator.swift in Sources */,
+				DA04EF642156B7D100B29EDE /* Migration.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -298,6 +309,7 @@
 				DA1A8B4E214761B3005C3D05 /* MockModels.swift in Sources */,
 				DA1A8B5521477369005C3D05 /* EncodableDiskTests.swift in Sources */,
 				DA1A8B5B214773BE005C3D05 /* DiskTests.swift in Sources */,
+				DA04EF682156BB5D00B29EDE /* MigratorTests.swift in Sources */,
 				DA1A8B572147737D005C3D05 /* PackagableDiskTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
