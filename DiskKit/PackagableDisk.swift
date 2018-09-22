@@ -53,8 +53,7 @@ public class PackagableDisk {
      * @orignalUrl: the original location of the package (you should provide this if you're updating an existing package)
      */
     public static func store(_ package: Packagable, to url: URL, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws {
-        let filename = url.lastPathComponent
-        let fileWrapper = try package.makeFileWrapper(filename: filename)
+        let fileWrapper = try package.makeFileWrapper(saveUrl: url)
         try fileWrapper.write(to: url, options: options, originalContentsURL: originalUrl)
         
         #if DEBUG

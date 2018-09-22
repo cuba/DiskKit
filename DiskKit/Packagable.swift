@@ -15,8 +15,8 @@ public protocol Packagable {
 
 public extension Packagable {
     
-    public func makeFileWrapper(filename: String) throws -> FileWrapper {
-        let package = Package(filename: filename, savedUrl: nil)
+    public func makeFileWrapper(saveUrl: URL) throws -> FileWrapper {
+        let package = Package(filename: saveUrl.lastPathComponent, savedUrl: saveUrl)
         try fill(package: package)
         return try package.makeFileWrapper()
     }
