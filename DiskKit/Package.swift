@@ -28,6 +28,7 @@ public class Package {
     
     init(filename: String, savedUrl: URL?) {
         self.filename = filename
+        self.savedUrl = savedUrl
     }
     
     public convenience init(_ fileWrapper: FileWrapper, savedUrl: URL?) throws {
