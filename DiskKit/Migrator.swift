@@ -10,25 +10,46 @@ import Foundation
 
 public class Migrator {
     public static let shared = Migrator()
-    private let migrationsKey = "com.pineapplepush.DiskKit.Migrations"
+    private let migrationsStorageKey = "com.pineapplepush.DiskKit.Migrations"
+    private var migrations: [String]
     
-    public init() {}
+    public init() {
+        let userDefaults = UserDefaults.standard
+        self.migrations = userDefaults.array(forKey: migrationsStorageKey) as? [String] ?? []
+    }
     
     public func migrate(_ migrations: [Migration]) {
-        let userDefaults = UserDefaults.standard
-        var keys: [String] = (userDefaults.array(forKey: "com.pineapplepush.DiskKit.Migrations") as? [String]) ?? []
-        
         for migration in migrations {
-            let migrationName = migration.uniqueName
-            guard !keys.contains(migrationName) else { continue }
+            guard !isMigrated(migration) else { continue }
             migration.migrate()
-            keys.append(migrationName)
-            userDefaults.set(keys, forKey: migrationsKey)
+            markAsMigrated(for: migration)
         }
     }
     
     public func reset() {
+        migrations = []
         let userDefaults = UserDefaults.standard
-        userDefaults.set(nil, forKey: migrationsKey)
+        userDefaults.set(nil, forKey: migrationsStorageKey)
+    }
+    
+    public func reset(_ migration: Migration) {
+        while let index = migrations.index(of: migration.uniqueName) {
+            migrations.remove(at: index)
+        }
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(migrations, forKey: migrationsStorageKey)
+    }
+    
+    public func isMigrated(_ migration: Migration) -> Bool {
+        return migrations.contains(migration.uniqueName)
+    }
+    
+    public func markAsMigrated(for migration: Migration) {
+        guard !isMigrated(migration) else { return }
+        migrations.append(migration.uniqueName)
+        
+        let userDefaults = UserDefaults.standard
+        userDefaults.set(migrations, forKey: migrationsStorageKey)
     }
 }
