@@ -14,5 +14,5 @@ public enum MigrationError: Error {
 
 public protocol Migration {
     var uniqueName: String { get }
-    func migrate()
+    func migrate(completion: @escaping () -> Void)
 }

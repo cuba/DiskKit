@@ -28,25 +28,39 @@ class MigratorTests: XCTestCase {
             MockMigration(uniqueName: "MockMigration2")
         ]
         
+        let expectation = XCTestExpectation(description: "Migratons Complete")
+        
         // When
-        Migrator.shared.migrate(migrations)
-        Migrator.shared.migrate(migrations)
+        Migrator.shared.migrate(migrations) {
+            Migrator.shared.migrate(migrations) {
+                XCTAssert(migrations[0].numberOfTimesRan == 1)
+                XCTAssert(migrations[1].numberOfTimesRan == 1)
+                expectation.fulfill()
+            }
+        }
         
         // Then
-        XCTAssert(migrations[0].numberOfTimesRan == 1)
-        XCTAssert(migrations[1].numberOfTimesRan == 1)
+        wait(for: [expectation], timeout: 10)
     }
     
     func testGivenMigration_WhenMigrated_ResetMigrationsWorks() {
         // Given
         let migration = MockMigration(uniqueName: "MockMigration")
+        let expectation = XCTestExpectation(description: "Migratons Complete")
         
         // When
-        Migrator.shared.migrate([migration])
-        Migrator.shared.reset(migration)
-        Migrator.shared.migrate([migration])
+        Migrator.shared.migrate([migration]) {
+            Migrator.shared.reset(migration)
+            
+            Migrator.shared.migrate([migration]) {
+                // Then
+                XCTAssert(migration.numberOfTimesRan == 2)
+                
+                expectation.fulfill()
+            }
+        }
         
         // Then
-        XCTAssert(migration.numberOfTimesRan == 2)
+        wait(for: [expectation], timeout: 10)
     }
 }
