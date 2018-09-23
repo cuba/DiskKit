@@ -33,7 +33,11 @@ public class Migrator {
     }
     
     public func reset(_ migration: Migration) {
-        while let index = migrations.index(of: migration.uniqueName) {
+        resetMigration(withName: migration.uniqueName)
+    }
+    
+    public func resetMigration(withName name: String) {
+        while let index = migrations.index(of: name) {
             migrations.remove(at: index)
         }
         

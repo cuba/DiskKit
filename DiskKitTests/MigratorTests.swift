@@ -36,4 +36,17 @@ class MigratorTests: XCTestCase {
         XCTAssert(migrations[0].numberOfTimesRan == 1)
         XCTAssert(migrations[1].numberOfTimesRan == 1)
     }
+    
+    func testGivenMigration_WhenMigrated_ResetMigrationsWorks() {
+        // Given
+        let migration = MockMigration(uniqueName: "MockMigration")
+        
+        // When
+        Migrator.shared.migrate([migration])
+        Migrator.shared.reset(migration)
+        Migrator.shared.migrate([migration])
+        
+        // Then
+        XCTAssert(migration.numberOfTimesRan == 2)
+    }
 }
