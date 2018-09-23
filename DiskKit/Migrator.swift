@@ -18,29 +18,11 @@ public class Migrator {
         self.migrations = userDefaults.array(forKey: migrationsStorageKey) as? [String] ?? []
     }
     
-    public func migrate(_ migrations: [Migration], completion: @escaping () -> Void) {
-        var numberOfCompletions = 0
-        
+    public func migrate(_ migrations: [Migration]) {
         for migration in migrations {
-            guard !isMigrated(migration) else {
-                numberOfCompletions += 1
-                
-                if numberOfCompletions >= migrations.count {
-                    completion()
-                }
-                
-                continue
-            }
-            
-            
-            migration.migrate() {
-                self.markAsMigrated(for: migration)
-                numberOfCompletions += 1
-                
-                if numberOfCompletions >= migrations.count {
-                    completion()
-                }
-            }
+            guard !isMigrated(migration) else { continue }
+            migration.migrate()
+            markAsMigrated(for: migration)
         }
     }
     

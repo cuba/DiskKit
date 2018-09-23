@@ -160,9 +160,8 @@ class MockMigration: Migration {
     var uniqueName: String
     var numberOfTimesRan = 0
     
-    func migrate(completion: @escaping () -> Void) {
+    func migrate() {
         numberOfTimesRan += 1
-        completion()
     }
     
     init(uniqueName: String) {
