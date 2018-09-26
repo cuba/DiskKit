@@ -159,12 +159,35 @@ extension MockPackage: Equatable {
 class MockMigration: Migration {
     var uniqueName: String
     var numberOfTimesRan = 0
+    var errors: [Error] = []
+    let directory: URL
     
     func migrate() {
+        let packages: [MockPackage] = [
+            MockPackage(id: "\(uniqueName)_1"),
+            MockPackage(id: "\(uniqueName)_2"),
+            MockPackage(id: "\(uniqueName)_3"),
+            MockPackage(id: "\(uniqueName)_4"),
+            MockPackage(id: "\(uniqueName)_5"),
+            MockPackage(id: "\(uniqueName)_6")
+        ]
+        
         numberOfTimesRan += 1
+        
+        for package in packages {
+            let filename = "\(Date().timeIntervalSince1970)"
+            let url = directory.appendingPathComponent(filename)
+            
+            do {
+                try PackagableDisk.store(package, to: url)
+            } catch let error {
+                errors.append(error)
+            }
+        }
     }
     
-    init(uniqueName: String) {
+    init(uniqueName: String, directory: URL) {
         self.uniqueName = uniqueName
+        self.directory = directory
     }
 }

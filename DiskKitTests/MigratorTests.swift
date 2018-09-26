@@ -23,9 +23,10 @@ class MigratorTests: XCTestCase {
     
     func testGivenMigrations_WhenMigrated_OnlyRunsOnce() {
         // Given
+        let directory = Disk.Directory.documents.baseUrl
         let migrations = [
-            MockMigration(uniqueName: "MockMigration1"),
-            MockMigration(uniqueName: "MockMigration2")
+            MockMigration(uniqueName: "MockMigration1", directory: directory),
+            MockMigration(uniqueName: "MockMigration2", directory: directory)
         ]
         
         // When
@@ -35,11 +36,14 @@ class MigratorTests: XCTestCase {
         // Then
         XCTAssert(migrations[0].numberOfTimesRan == 1)
         XCTAssert(migrations[1].numberOfTimesRan == 1)
+        XCTAssert(migrations[0].errors.count == 0)
+        XCTAssert(migrations[1].errors.count == 0)
     }
     
     func testGivenMigration_WhenMigrated_ResetMigrationsWorks() {
         // Given
-        let migration = MockMigration(uniqueName: "MockMigration")
+        let directory = Disk.Directory.documents.baseUrl
+        let migration = MockMigration(uniqueName: "MockMigration", directory: directory)
         
         // When
         Migrator.shared.migrate([migration])
