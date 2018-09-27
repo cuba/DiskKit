@@ -10,6 +10,7 @@
 		DA1A8BE32150AC8A005C3D05 /* DocumentBrowserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8BE22150AC8A005C3D05 /* DocumentBrowserViewController.swift */; };
 		DA1A8BE52150AFB5005C3D05 /* ArticleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8BE42150AFB5005C3D05 /* ArticleViewController.swift */; };
 		DA1A8BEF21529557005C3D05 /* DiskUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8BEE21529557005C3D05 /* DiskUtility.swift */; };
+		DA4AEE95215C615A00952456 /* ExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4837421447F3F00C19A58 /* ExampleTests.swift */; };
 		DAE4835E21447F3E00C19A58 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4835D21447F3E00C19A58 /* AppDelegate.swift */; };
 		DAE4836721447F3F00C19A58 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAE4836621447F3F00C19A58 /* Assets.xcassets */; };
 		DAE4836A21447F3F00C19A58 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAE4836821447F3F00C19A58 /* LaunchScreen.storyboard */; };
@@ -275,6 +276,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DA4AEE95215C615A00952456 /* ExampleTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -484,6 +486,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5P99QDD6WR;
 				INFOPLIST_FILE = Example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -503,6 +506,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 5P99QDD6WR;
 				INFOPLIST_FILE = Example/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
