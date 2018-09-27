@@ -2,7 +2,7 @@
 //  ExampleTests.swift
 //  ExampleTests
 //
-//  Created by Jacob Sikorski on 2018-09-08.
+//  Created by Jacob Sikorski on 2018-09-26.
 //  Copyright © 2018 Jacob Sikorski. All rights reserved.
 //
 
@@ -10,15 +10,13 @@ import XCTest
 @testable import Example
 
 class ExampleTests: XCTestCase {
-    
+
     override func setUp() {
-        super.setUp()
         DiskUtility.clearDocuments()
     }
     
     override func tearDown() {
         DiskUtility.clearDocuments()
-        super.tearDown()
     }
     
     func testSavingPackages() {

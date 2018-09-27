@@ -17,7 +17,7 @@
 			<string>Alternate</string>
 			<key>LSItemContentTypes</key>
 			<array>
-				<string>com.pineapplepush.Example.package</string>
+				<string>com.jacobsikorski.DiskKit.Example.package</string>
 			</array>
 		</dict>
 	</array>
@@ -81,7 +81,7 @@
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>com.pineapplepush.Example.package</string>
+			<string>com.jacobsikorski.DiskKit.Example.package</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
