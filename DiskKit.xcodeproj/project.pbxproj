@@ -16,7 +16,7 @@
 		DA1A8B5B214773BE005C3D05 /* DiskTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B5A214773BE005C3D05 /* DiskTests.swift */; };
 		DA1A8B7A214D9E8B005C3D05 /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B79214D9E8B005C3D05 /* Directory.swift */; };
 		DA1A8B7E214DAD8A005C3D05 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */; };
-		DA1A8B83214EED84005C3D05 /* Packagable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B82214EED84005C3D05 /* Packagable.swift */; };
+		DA1A8B83214EED84005C3D05 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B82214EED84005C3D05 /* Package.swift */; };
 		DA1A8B85214EEDA3005C3D05 /* DiskCodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1A8B84214EEDA3005C3D05 /* DiskCodable.swift */; };
 		DA1A8BFD215330BA005C3D05 /* Cartfile in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BF9215330BA005C3D05 /* Cartfile */; };
 		DA1A8BFE215330BA005C3D05 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = DA1A8BFA215330BA005C3D05 /* LICENSE */; };
@@ -51,7 +51,7 @@
 		DA1A8B5A214773BE005C3D05 /* DiskTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskTests.swift; sourceTree = "<group>"; };
 		DA1A8B79214D9E8B005C3D05 /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
 		DA1A8B7D214DAD8A005C3D05 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DA1A8B82214EED84005C3D05 /* Packagable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Packagable.swift; sourceTree = "<group>"; };
+		DA1A8B82214EED84005C3D05 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		DA1A8B84214EEDA3005C3D05 /* DiskCodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskCodable.swift; sourceTree = "<group>"; };
 		DA1A8BF9215330BA005C3D05 /* Cartfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Cartfile; sourceTree = SOURCE_ROOT; };
 		DA1A8BFA215330BA005C3D05 /* LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = LICENSE; sourceTree = SOURCE_ROOT; };
@@ -95,7 +95,7 @@
 				DA1A8B84214EEDA3005C3D05 /* DiskCodable.swift */,
 				DAE483A0214572C800C19A58 /* File.swift */,
 				DA1A8B79214D9E8B005C3D05 /* Directory.swift */,
-				DA1A8B82214EED84005C3D05 /* Packagable.swift */,
+				DA1A8B82214EED84005C3D05 /* Package.swift */,
 				DA04EF632156B7D100B29EDE /* Migration.swift */,
 			);
 			name = Models;
@@ -297,7 +297,7 @@
 				DAD01100214427AB0038E5A4 /* Disk.swift in Sources */,
 				DA1A8B7A214D9E8B005C3D05 /* Directory.swift in Sources */,
 				DAE483A1214572C800C19A58 /* File.swift in Sources */,
-				DA1A8B83214EED84005C3D05 /* Packagable.swift in Sources */,
+				DA1A8B83214EED84005C3D05 /* Package.swift in Sources */,
 				DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */,
 				DA04EF662156B7E500B29EDE /* Migrator.swift in Sources */,
 				DA04EF642156B7D100B29EDE /* Migration.swift in Sources */,
