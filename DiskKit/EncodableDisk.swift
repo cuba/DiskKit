@@ -19,8 +19,8 @@ public class EncodableDisk {
      * @filename: what to name the file where the struct data will be stored
      */
     @discardableResult public static func store<T: Encodable>(_ file: T, to directory: Disk.Directory, as filename: String, path: String? = nil) throws -> URL {
-        let diskData = try DiskData(file: file, name: filename)
-        return try Disk.store(diskData, to: directory, path: path)
+        let file = try File(file: file, name: filename)
+        return try Disk.store(file, to: directory, path: path)
     }
     
     /**
@@ -31,7 +31,7 @@ public class EncodableDisk {
      * @Returns: decoded struct model(s) of data
      */
     public static func file<T: Decodable>(withName filename: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
-        let file = try Disk.diskData(withName: filename, in: directory, path: path)
+        let file = try Disk.file(withName: filename, in: directory, path: path)
         return try file?.decode()
     }
     
@@ -39,7 +39,7 @@ public class EncodableDisk {
      * Retrieve all files at specified directory
      */
     public static func files<T: Decodable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
-        let files = try Disk.diskDataArray(in: directory, path: path)
+        let files = try Disk.filesArray(in: directory, path: path)
         
         return files.compactMap({
             return try? $0.decode()
@@ -56,8 +56,8 @@ public class EncodableDisk {
      */
     @discardableResult
     public static func store<T: DiskEncodable>(_ file: T, to directory: Disk.Directory, as filename: String, path: String? = nil) throws -> URL {
-        let diskData = try DiskData(file: file, name: filename)
-        return try Disk.store(diskData, to: directory, path: path)
+        let file = try File(file: file, name: filename)
+        return try Disk.store(file, to: directory, path: path)
     }
     
     /**
@@ -68,7 +68,7 @@ public class EncodableDisk {
      * @Returns: decoded struct model(s) of data
      */
     public static func file<T: DiskDecodable>(withName filename: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
-        let file = try Disk.diskData(withName: filename, in: directory, path: path)
+        let file = try Disk.file(withName: filename, in: directory, path: path)
         return try file?.decode()
     }
     
@@ -76,7 +76,7 @@ public class EncodableDisk {
      * Retrieve all files at specified directory
      */
     public static func files<T: DiskDecodable>(in directory: Disk.Directory, withSubfolder path: String? = nil) throws -> [T] {
-        let files = try Disk.diskDataArray(in: directory, path: path)
+        let files = try Disk.filesArray(in: directory, path: path)
         
         return files.compactMap({
             return try? $0.decode()

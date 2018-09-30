@@ -1,5 +1,5 @@
 //
-//  DiskData.swift
+//  File.swift
 //  DiskKit
 //
 //  Created by Jacob Sikorski on 2018-09-09.
@@ -18,7 +18,7 @@ public enum ImageFileType {
     case png
     case jpg(compressionQuality: Double)
     
-    var fileExtension: String {
+    var typeIdentifier: String {
         switch self {
         case .png: return "png"
         case .jpg: return "jpg"
@@ -45,7 +45,7 @@ public extension UIImage {
     }
 }
 
-public struct DiskData {
+public struct File {
     
     public let filename: String
     public let data: Data
@@ -137,8 +137,8 @@ public struct DiskData {
     }
 }
 
-extension DiskData: Equatable {
-    public static func == (lhs: DiskData, rhs: DiskData) -> Bool {
+extension File: Equatable {
+    public static func == (lhs: File, rhs: File) -> Bool {
         return lhs.filename == rhs.filename
     }
 }

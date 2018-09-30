@@ -20,26 +20,25 @@ public enum PackageDecodingError: Error {
     case unableToDecodeFile(cause: Error?)
 }
 
-public class Package {
-    private(set) public var filename: String
-    private(set) public var savedUrl: URL
-    private(set) public var files: [DiskData] = []
-    private(set) public var directories: [String: Package] = [:]
+public class Directory {
+    private(set) public var name: String
+    private(set) public var files: [File] = []
+    private(set) public var directories: [Directory] = []
     
-    init(filename: String, savedUrl: URL) {
-        self.filename = filename
-        self.savedUrl = savedUrl
+    init(name: String) {
+        self.name = name
     }
     
-    public convenience init(_ fileWrapper: FileWrapper, savedUrl: URL) throws {
-        self.init(filename: fileWrapper.filename!, savedUrl: savedUrl)
+    init(_ fileWrapper: FileWrapper) throws {
+        self.name = fileWrapper.filename!
         
         for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
             if subFileWrapper.isDirectory {
-                directories[name] = try Package(subFileWrapper, savedUrl: savedUrl.appendingPathComponent(name))
+                let directory = try Directory(subFileWrapper)
+                directories.append(directory)
             } else {
                 guard let data = subFileWrapper.regularFileContents else { continue }
-                add(DiskData(data: data, name: name))
+                add(File(data: data, name: name))
             }
         }
     }
@@ -47,11 +46,11 @@ public class Package {
     // MARK: - Add
     
     public func add(data: Data, name: String) {
-        let diskData = DiskData(data: data, name: name)
-        add(diskData)
+        let file = File(data: data, name: name)
+        add(file)
     }
     
-    public func add(_ file: DiskData) {
+    public func add(_ file: File) {
         if let index = files.index(of: file) {
             files[index] = file
         } else {
@@ -63,8 +62,8 @@ public class Package {
         guard let text = text else { return }
         
         do {
-            let diskData = try DiskData(text: text, name: name, encoding: encoding)
-            add(diskData)
+            let file = try File(text: text, name: name, encoding: encoding)
+            add(file)
         } catch let error {
             throw PackageEncodingError.unableToEncodeFile(cause: error)
         }
@@ -74,8 +73,8 @@ public class Package {
         guard let image = image else { return }
         
         do {
-            let diskData = try DiskData(image: image, name: name, type: type)
-            add(diskData)
+            let file = try File(image: image, name: name, type: type)
+            add(file)
         } catch let error {
             throw PackageEncodingError.unableToEncodeFile(cause: error)
         }
@@ -85,8 +84,8 @@ public class Package {
         guard let file = file else { return }
         
         do {
-            let diskData = try DiskData(file: file, name: name)
-            add(diskData)
+            let file = try File(file: file, name: name)
+            add(file)
         } catch let error {
             throw PackageEncodingError.unableToEncodeFile(cause: error)
         }
@@ -96,109 +95,91 @@ public class Package {
         guard let file = file else { return }
         
         do {
-            let diskData = try DiskData(file: file, name: name)
-            add(diskData)
+            let file = try File(file: file, name: name)
+            add(file)
         } catch let error {
             throw PackageEncodingError.unableToEncodeFile(cause: error)
         }
     }
     
     public func add<T: DiskEncodable>(_ fileArray: [T], name: String) throws {
-        let package = Package(filename: name, savedUrl: savedUrl.appendingPathComponent(name))
+        let directory = Directory(name: name)
         
         for (index, file) in fileArray.enumerated() {
-            try package.add(file, name: "file_\(index)")
+            try directory.add(file, name: "file_\(index)")
         }
         
-        directories[name] = package
+        directories.append(directory)
     }
     
     public func add<T: Encodable>(_ fileArray: [T], name: String) throws {
-        let package = Package(filename: name, savedUrl: savedUrl.appendingPathComponent(name))
+        let directory = Directory(name: name)
         
         for (index, file) in fileArray.enumerated() {
-            try package.add(file, name: "file_\(index)")
+            try directory.add(file, name: "file_\(index)")
         }
         
-        directories[name] = package
+        directories.append(directory)
     }
     
-    public func add(_ diskDataArray: [DiskData], name: String) throws {
-        let package = Package(filename: name, savedUrl: savedUrl.appendingPathComponent(name))
+    public func add(_ filesArray: [File], name: String) throws {
+        let directory = Directory(name: name)
         
-        for (_, file) in diskDataArray.enumerated() {
-            package.add(file)
+        for (_, file) in filesArray.enumerated() {
+            directory.add(file)
         }
         
-        directories[name] = package
+        directories.append(directory)
     }
     
-    public func add<T: Packagable>(_ packagable: T?, name: String) throws {
-        guard let packagable = packagable else { return }
-        
-        let package = Package(filename: name, savedUrl: savedUrl.appendingPathComponent(name))
-        try packagable.fill(package: package)
-        directories[name] = package
-    }
-    
-    public func add<T: Packagable>(_ packagableArray: [T], name: String) throws {
-        let package = Package(filename: name, savedUrl: savedUrl.appendingPathComponent(name))
-        
-        for (index, packagable) in packagableArray.enumerated() {
-            do {
-                try package.add(packagable, name: "package_\(index)")
-            } catch let error {
-                throw PackageEncodingError.unableToEncodeFile(cause: error)
-            }
-        }
-        
-        directories[name] = package
+    public func add(_ directory: Directory, name: String) {
+        directories.append(directory)
     }
     
     // MARK: - Get Data
     
     public func data(_ name: String) throws -> Data {
-        guard let diskData = files.first(where: { $0.filename == name }) else {
+        guard let file = files.first(where: { $0.filename == name }) else {
             throw PackageDecodingError.fileNotFound
         }
         
-        return diskData.data
+        return file.data
     }
     
-    // MARK: - Get DiskData
+    // MARK: - Get File
     
-    public func diskData(_ name: String) throws -> DiskData {
-        guard let diskData = files.first(where: { $0.filename == name }) else {
+    public func file(_ name: String) throws -> File {
+        guard let file = files.first(where: { $0.filename == name }) else {
             throw PackageDecodingError.fileNotFound
         }
         
-        return diskData
+        return file
     }
     
-    public func diskData(_ name: String) -> DiskData? {
+    public func file(_ name: String) -> File? {
         return files.first(where: { $0.filename == name })
     }
     
     // MARK: - Get Decodable
     
     public func file<T: Decodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.filename == name }) else { return nil }
-        return try diskData.decode()
+        guard let file = files.first(where: { $0.filename == name }) else { return nil }
+        return try file.decode()
     }
     
     public func file<T: Decodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.filename == name }) else {
+        guard let file = files.first(where: { $0.filename == name }) else {
             throw PackageDecodingError.fileNotFound
         }
         
-        return try diskData.decode()
+        return try file.decode()
     }
     
     public func fileArray<T: Decodable>() throws -> [T] {
         var files: [T] = []
         
-        for diskData in self.files {
-            let file: T = try diskData.decode()
+        for file in self.files {
+            let file: T = try file.decode()
             files.append(file)
         }
         
@@ -206,39 +187,39 @@ public class Package {
     }
     
     public func fileArray<T: Decodable>(_ directoryName: String) throws -> [T] {
-        guard let package = directories[directoryName] else {
+        guard let directory = directories.first(where: { $0.name == directoryName }) else {
             throw PackageDecodingError.directoryNotFound
         }
         
-        return try package.fileArray()
+        return try directory.fileArray()
     }
     
     // MARK: - Get DiskDecodable
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T? {
-        guard let diskData = files.first(where: { $0.filename == name }) else { return nil }
+        guard let file = files.first(where: { $0.filename == name }) else { return nil }
         
         do {
-            return try diskData.decode()
+            return try file.decode()
         } catch let error {
             throw PackageDecodingError.unableToDecodeFile(cause: error)
         }
     }
     
     public func file<T: DiskDecodable>(_ name: String) throws -> T {
-        guard let diskData = files.first(where: { $0.filename == name }) else {
+        guard let file = files.first(where: { $0.filename == name }) else {
             throw PackageDecodingError.fileNotFound
         }
         
-        return try diskData.decode()
+        return try file.decode()
     }
     
     public func fileArray<T: DiskDecodable>() throws -> [T] {
         var files: [T] = []
         
-        for diskData in self.files {
+        for file in self.files {
             do {
-                let file: T = try diskData.decode()
+                let file: T = try file.decode()
                 files.append(file)
             } catch let error {
                 throw PackageDecodingError.unableToDecodeFile(cause: error)
@@ -249,19 +230,19 @@ public class Package {
     }
     
     public func fileArray<T: DiskDecodable>(_ directoryName: String) throws -> [T] {
-        guard let package = directories[directoryName] else {
+        guard let directory = directories.first(where: { $0.name == directoryName }) else {
             throw PackageDecodingError.directoryNotFound
         }
         
-        return try package.fileArray()
+        return try directory.fileArray()
     }
     
     // MARK: - Get Image
     
     public func image(_ name: String) throws -> UIImage {
-        let diskData: DiskData = try self.diskData(name)
+        let file: File = try self.file(name)
         
-        guard let image = diskData.image() else {
+        guard let image = file.image() else {
             throw PackageDecodingError.unableToDecodeFile(cause: nil)
         }
         
@@ -269,21 +250,31 @@ public class Package {
     }
     
     public func image(_ name: String) throws -> UIImage? {
-        guard let diskData = files.first(where: { $0.filename == name }) else { return nil }
+        guard let file = files.first(where: { $0.filename == name }) else { return nil }
         
-        guard let image = diskData.image() else {
+        guard let image = file.image() else {
             throw PackageDecodingError.unableToDecodeFile(cause: nil)
         }
         
         return image
     }
     
+    // MARK: - Get Directory
+    
+    public func directory(_ name: String) throws -> Directory {
+        guard let directory = directories.first(where: { $0.name == name }) else {
+            throw PackageDecodingError.directoryNotFound
+        }
+        
+        return directory
+    }
+    
     // MARK: - Get Text
     
     public func text(_ name: String, encoding: String.Encoding) throws -> String {
-        let diskData: DiskData = try self.diskData(name)
+        let file: File = try self.file(name)
         
-        guard let text = diskData.text(encoding: encoding) else {
+        guard let text = file.text(encoding: encoding) else {
             throw PackageDecodingError.unableToDecodeFile(cause: nil)
         }
         
@@ -291,47 +282,13 @@ public class Package {
     }
     
     public func text(_ name: String, encoding: String.Encoding) throws -> String? {
-        guard let diskData = files.first(where: { $0.filename == name }) else { return nil }
+        guard let file = files.first(where: { $0.filename == name }) else { return nil }
         
-        guard let text = diskData.text(encoding: encoding) else {
+        guard let text = file.text(encoding: encoding) else {
             throw PackageDecodingError.unableToDecodeFile(cause: nil)
         }
         
         return text
-    }
-    
-    // MARK: - Get Packagable
-    
-    public func file<T: Packagable>(_ name: String) throws -> T? {
-        guard let package = directories[name] else { return nil }
-        return try T(package: package)
-    }
-    
-    public func file<T: Packagable>(_ name: String) throws -> T {
-        guard let package = directories[name] else {
-            throw PackageDecodingError.directoryNotFound
-        }
-        
-        return try T(package: package)
-    }
-    
-    public func fileArray<T: Packagable>(_ name: String) throws -> [T] {
-        guard let package = directories[name] else {
-            throw PackageDecodingError.directoryNotFound
-        }
-        
-        return try package.fileArray()
-    }
-    
-    public func fileArray<T: Packagable>() throws -> [T] {
-        var files: [T] = []
-        
-        for (_, package) in directories {
-            let file = try T(package: package)
-            files.append(file)
-        }
-        
-        return files
     }
     
     public func makeFileWrapper() throws -> FileWrapper {
@@ -341,10 +298,32 @@ public class Package {
             fileWrappers[file.filename] = file.makeFileWrapper()
         }
         
-        for (directoryName, package) in directories {
-            fileWrappers[directoryName] = try package.makeFileWrapper()
+        for (directory) in directories {
+            fileWrappers[directory.name] = try directory.makeFileWrapper()
         }
         
         return FileWrapper(directoryWithFileWrappers: fileWrappers)
+    }
+}
+
+public class Package: Directory  {
+    public let typeIdentifier: String?
+    public let savedUrl: URL
+    
+    public var filename: String {
+        return name
+    }
+    
+    init(filename: String, savedUrl: URL, typeIdentifier: String?) {
+        self.typeIdentifier = typeIdentifier
+        self.savedUrl = savedUrl
+        super.init(name: filename)
+    }
+    
+    init(_ fileWrapper: FileWrapper, savedUrl: URL, typeIdentifier: String?) throws {
+        self.savedUrl = savedUrl
+        self.typeIdentifier = typeIdentifier
+        
+        try super.init(fileWrapper)
     }
 }

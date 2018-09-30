@@ -26,17 +26,17 @@ class DiskTests: XCTestCase {
         let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
-        guard let diskData = try? DiskData(file: testFile, name: filename) else {
+        guard let file = try? File(file: testFile, name: filename) else {
             XCTAssert(false)
             return
         }
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
+        XCTAssertNoThrow(try Disk.store(file, to: .documents, path: "some_folder"))
         
         // Then
-        guard let loadedDiskData = try! Disk.diskData(withName: filename, in: .documents, path: "some_folder") else {
+        guard let loadedDiskData = try! Disk.file(withName: filename, in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -55,17 +55,17 @@ class DiskTests: XCTestCase {
         // Given
         let testFiles = [MockCodable(id: "ABC"), MockCodable(id: "123")]
         
-        let diskDataArray = testFiles.enumerated().compactMap({
-            return try? DiskData(file: $0.element, name: "example_\($0.offset)")
+        let filesArray = testFiles.enumerated().compactMap({
+            return try? File(file: $0.element, name: "example_\($0.offset)")
         })
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try Disk.store(diskDataArray[0], to: .documents, path: "some_folder"))
-        XCTAssertNoThrow(try Disk.store(diskDataArray[1], to: .documents, path: "some_folder"))
+        XCTAssertNoThrow(try Disk.store(filesArray[0], to: .documents, path: "some_folder"))
+        XCTAssertNoThrow(try Disk.store(filesArray[1], to: .documents, path: "some_folder"))
         
         // Then
-        guard let loadedDiskDataArray = try? Disk.diskDataArray(in: .documents, path: "some_folder") else {
+        guard let loadedDiskDataArray = try? Disk.filesArray(in: .documents, path: "some_folder") else {
             XCTAssert(false)
             return
         }
@@ -85,14 +85,14 @@ class DiskTests: XCTestCase {
         let filename = "example.json"
         let testFile = MockCodable(id: "ABC")
         
-        guard let diskData = try? DiskData(file: testFile, name: filename) else {
+        guard let file = try? File(file: testFile, name: filename) else {
             XCTAssert(false)
             return
         }
         
         // When
         XCTAssertNoThrow(try Disk.create(path: "some_folder", in: .documents))
-        XCTAssertNoThrow(try Disk.store(diskData, to: .documents, path: "some_folder"))
+        XCTAssertNoThrow(try Disk.store(file, to: .documents, path: "some_folder"))
         
         // Then
         XCTAssertTrue(Disk.fileExists(in: .documents, withFileName: filename, path: "some_folder"))

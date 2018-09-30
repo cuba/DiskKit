@@ -44,7 +44,7 @@ class PackagableDiskTests: XCTestCase {
         }
     }
     
-    func testGivenCodableFile_WhenSaveFile_ThenDiskDataArrayReturnsAllFiles() {
+    func testGivenPackagableFile_WhenSaveFile_ThenPackagableDiskReturnsAllFiles() {
         // Given
         let testFiles = [
             MockPackage(id: "ABC"),
@@ -67,6 +67,33 @@ class PackagableDiskTests: XCTestCase {
             
             XCTAssert(loadedFiles[0] == testFiles[0])
             XCTAssert(loadedFiles[1] == testFiles[1])
+        } catch {
+            XCTAssert(false)
+        }
+    }
+    
+    func testGivenDifferentPackagableFiles_WhenSaveFile_ThenPackagableDiskReturnsFilesOfCorrectType() {
+        // Given
+        let testFiles = [
+            MockPackage(id: "ABC"),
+            MockPackage(id: "123")
+        ]
+        
+        // When
+        XCTAssertNoThrow(try Disk.create(path: "some_folder/sub_folder", in: .documents))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, as: "example_2.other_package", path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, as: "example_1.package", path: "some_folder/sub_folder"))
+        
+        // Then
+        do {
+            let loadedFiles: [MockPackage] = try PackagableDisk.packagables(in: .documents, path: "some_folder", typeIdentifier: "com.jacobsikorski.DiskKit.Example.package")
+            
+            guard loadedFiles.count == 1 else {
+                XCTAssert(false)
+                return
+            }
+            
+            XCTAssert(loadedFiles[0] == testFiles[1])
         } catch {
             XCTAssert(false)
         }

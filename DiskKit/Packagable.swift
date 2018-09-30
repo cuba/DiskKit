@@ -9,6 +9,7 @@
 import Foundation
 
 public protocol Packagable {
+    static var typeIdentifier: String { get }
     init(package: Package) throws
     func fill(package: Package) throws
 }
@@ -16,7 +17,7 @@ public protocol Packagable {
 public extension Packagable {
     
     public func makeFileWrapper(saveUrl: URL) throws -> FileWrapper {
-        let package = Package(filename: saveUrl.lastPathComponent, savedUrl: saveUrl)
+        let package = Package(filename: saveUrl.lastPathComponent, savedUrl: saveUrl, typeIdentifier: type(of: self).typeIdentifier)
         try fill(package: package)
         return try package.makeFileWrapper()
     }

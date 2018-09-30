@@ -10,6 +10,7 @@ import Foundation
 import DiskKit
 
 struct Article: Packagable {
+    static let typeIdentifier: String = "com.jacobsikorski.diskkit.example.package"
     static let baseUrl = Disk.Directory.documents.makeUrl()
     
     var details: ArticleDetails

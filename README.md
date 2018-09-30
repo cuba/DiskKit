@@ -45,7 +45,7 @@ Run `carthage update` to build the framework and drag the built `DiskKit.framewo
 
 ### Supported files
 
-DiskKit supports Codable files like the following:
+#### Codable
 
 ```swift
 struct TestCodable: Codable {
@@ -57,7 +57,10 @@ struct TestCodable: Codable {
 }
 ```
 
-And DiskCodable files like the following:
+#### DiskCodable
+
+DiskCodable gives you some extra flexability with the types of files you can store.
+
 ```swift
 struct TestDiskCodable: DiskCodable {
     var id = UUID().uuidString
@@ -76,8 +79,11 @@ struct TestDiskCodable: DiskCodable {
 }
 ```
 
-DiskCodable gives you some extra flexability with the types of files you can store.
+#### File
 
+`File` is just a wrapper around a file. It allows you to easily save and load objects of a specific type.  It also is a great way to support polimorphyc file types useful when saving and getting data from a directly that contains mixed file types.
+
+It supports the files above plus some convenient extras such as `String`.
 
 ### Storing files
 
@@ -126,6 +132,8 @@ Packages also support nested packages which need to extend the `Package` protoco
 
 ```swift
 struct TestPackage: Packagable {
+    static let typeIdentifier = "com.example.myproject.myfileidentifier"
+    
     var codable: TestCodable
     var diskCodable: TestDiskCodable
     var subPackage: AnotherTestPackage
@@ -188,52 +196,51 @@ Without this additional information, your package will not be found.
 #### PackagableDisk supported types
 
 Packagable supports the following types:
-* `Packagable` types
-* `Packagable` arrays (i.e. `[Packagable]`) *These will be stored in auto-generated folder names*
+* `Directory` class
 * `Codable` types
-* `Codable` arrays (i.e. `[Codable]`) *These will be stored in auto-generated file names*
+* `Codable` arrays (i.e. `[T] where T: Codable`) *These will be stored in auto-generated file names*
 * `DiskCodable` types
-* `DiskCodable` arrays (i.e. `[DiskCodable]`) *These will be stored in auto-generated file names*
-* `DiskData` types
-* `DiskData` arrays (i.e. `[DiskData]`) *These will be stored in auto-generated file names*
+* `DiskCodable` arrays (i.e. `[T] where T: DiskCodable`) *These will be stored in auto-generated file names*
+* `File` class
+* `File` arrays (i.e. `[File]`) *These will be stored in auto-generated file names*
 * `UIImage` types
 * `String` types
 * `Data` types
 
-### Using DiskData
+### Using File
 
-DiskData is a helper class that lets you parse your files after retrieving them. This is useful when you're not sure what kind of file you are expected to recieve.  It is also used inside packages as it may contain a variety of different file types.
+File is a helper class that lets you parse your files after retrieving them. This is useful when you're not sure what kind of file you are expected to recieve.  It is also used inside packages as it may contain a variety of different file types.
 
-**Creating DiskData files**
+**Creating File objects**
 
 ```swift
 let filename = "example.json"
 let testFile = TestCodable(id: "ABC")
-let diskData = try DiskData(file: testFile, name: filename)
+let file = try File(file: testFile, name: filename)
 ```
 
-`DiskData` supports both `Codable` and `DiskCodable` files.
+`File` supports both `Codable` and `DiskCodable` files.
 
-**Storing DiskData files:**
+**Storing File objects:**
 
 ```swift
 try Disk.create(path: "some_folder", in: .documents)
-try Disk.store(diskData, to: .documents, path: "some_folder")
+try Disk.store(file, to: .documents, path: "some_folder")
 ```
 
-**Loading DiskData files:**
+**Loading File objects:**
 
 ```swift
-let loadedDiskData = try Disk.diskData(withName: filename, in: .documents, path: "some_folder")
+let loadedDiskData = try Disk.file(withName: filename, in: .documents, path: "some_folder")
 ```
 
-**Loading multiple DiskData files:**
+**Loading multiple File objects:**
 
 ```swift
-let loadedDiskDataArray = try Disk.diskDataArray(in: .documents, path: "some_folder")
+let loadedDiskDataArray = try Disk.filesArray(in: .documents, path: "some_folder")
 ```
 
-**Parsing a file from a DiskData file:**
+**Parsing a file from a File object:**
 
 ```swift
 let loadedFile: TestCodable = try loadedDiskData.decode()

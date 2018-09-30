@@ -29,6 +29,7 @@
 		DAE4839F21456C0800C19A58 /* EncodableDisk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE4839E21456C0800C19A58 /* EncodableDisk.swift */; };
 		DAE483A1214572C800C19A58 /* DiskData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE483A0214572C800C19A58 /* DiskData.swift */; };
 		DAE483A421457B9800C19A58 /* PackagableDisk.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE483A321457B9800C19A58 /* PackagableDisk.swift */; };
+		DAF23A0E2161454E00E74F64 /* URL+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF23A0D2161454E00E74F64 /* URL+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		DAE4839E21456C0800C19A58 /* EncodableDisk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EncodableDisk.swift; sourceTree = "<group>"; };
 		DAE483A0214572C800C19A58 /* DiskData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskData.swift; sourceTree = "<group>"; };
 		DAE483A321457B9800C19A58 /* PackagableDisk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackagableDisk.swift; sourceTree = "<group>"; };
+		DAF23A0D2161454E00E74F64 /* URL+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +162,7 @@
 			isa = PBXGroup;
 			children = (
 				DAE4834A2144486300C19A58 /* SearchPathDirectory+Extensions.swift */,
+				DAF23A0D2161454E00E74F64 /* URL+Extensions.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DAF23A0E2161454E00E74F64 /* URL+Extensions.swift in Sources */,
 				DAE4834B2144486300C19A58 /* SearchPathDirectory+Extensions.swift in Sources */,
 				DA1A8B85214EEDA3005C3D05 /* DiskCodable.swift in Sources */,
 				DAE483A421457B9800C19A58 /* PackagableDisk.swift in Sources */,

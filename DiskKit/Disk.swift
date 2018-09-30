@@ -71,31 +71,31 @@ public class Disk {
         }
     }
     
-    // MARK: - DiskData
+    // MARK: - File
     
     /**
      * Save the disk data to the directory specified
      */
-    public static func store(_ diskData: DiskData, to directory: Directory, path: String? = nil) throws -> URL {
-        let url = directory.makeUrl(path: path, filename: diskData.filename)
-        try store(diskData, to: url)
+    public static func store(_ file: File, to directory: Directory, path: String? = nil) throws -> URL {
+        let url = directory.makeUrl(path: path, filename: file.filename)
+        try store(file, to: url)
         return url
     }
 
     /**
      * Retrieve the disk data in the directory specified with the given file name
      */
-    public static func diskData(withName filename: String, in directory: Directory, path: String? = nil) throws -> DiskData? {
+    public static func file(withName filename: String, in directory: Directory, path: String? = nil) throws -> File? {
         let url = directory.makeUrl(path: path, filename: filename)
-        return try diskData(at: url)
+        return try file(at: url)
     }
     
     /**
      * Retrieve all disk data at specified directory
      */
-    public static func diskDataArray(in directory: Directory, path: String? = nil) throws -> [DiskData] {
+    public static func filesArray(in directory: Directory, path: String? = nil) throws -> [File] {
         let url = directory.makeUrl(path: path)
-        return try diskDataArray(in: url)
+        return try filesArray(in: url)
     }
     
     // MARK: - Files
@@ -236,27 +236,27 @@ public class Disk {
     /**
      * Save the disk data to the url specified
      */
-    public static func store(_ diskData: DiskData, to url: URL) throws {
-        try store(fileData: diskData.data, to: url)
+    public static func store(_ file: File, to url: URL) throws {
+        try store(fileData: file.data, to: url)
     }
     
     /**
      * Retrieve the disk data at the url specified
      */
-    public static func diskData(at url: URL) throws -> DiskData? {
+    public static func file(at url: URL) throws -> File? {
         guard let data = fileData(at: url) else { return nil }
-        return DiskData(data: data, name: url.lastPathComponent)
+        return File(data: data, name: url.lastPathComponent)
     }
     
     /**
      * Retrieve all disk data at specified directory url
      */
-    public static func diskDataArray(in url: URL) throws -> [DiskData] {
+    public static func filesArray(in url: URL) throws -> [File] {
         let urls = try contentsOfDirectory(at: url)
         
-        let diskDatas: [DiskData] = urls.compactMap({
+        let diskDatas: [File] = urls.compactMap({
             do {
-                return try self.diskData(at: $0)
+                return try self.file(at: $0)
             } catch {
                 return nil
             }

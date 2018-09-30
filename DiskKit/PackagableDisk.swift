@@ -30,7 +30,7 @@ public class PackagableDisk {
      * @directory: directory where package data is stored
      * @Returns: decoded package
      */
-    public static func packagables<T: Packagable>(in directory: Disk.Directory, path: String? = nil) throws -> [T] {
+    public static func packagables<T: Packagable>(in directory: Disk.Directory, path: String? = nil, typeIdentifier: String? = nil) throws -> [T] {
         let url = directory.makeUrl(path: path)
         return try packagables(in: url)
     }
@@ -69,12 +69,13 @@ public class PackagableDisk {
      * Retrieve and convert a packagables from a folder on disk
      * @url: url where package data is stored
      * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
+     * @typeIdentifier: The identifier of the file defined in the Info.plist file under UTTypeIdentifier
      * @Returns: decoded package
      */
     public static func packagables<T: Packagable>(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [T] {
         var packagables: [T] = []
         
-        for package in try packages(in: url, options: options) {
+        for package in try packages(in: url, options: options, typeIdentifier: T.typeIdentifier) {
             do {
                 let packagable = try T(package: package)
                 packagables.append(packagable)
@@ -103,15 +104,25 @@ public class PackagableDisk {
      * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
      * @Returns: decoded package
      */
-    public static func packages(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [Package] {
-        let resourceKeys: [URLResourceKey] = [.isPackageKey]
-        guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: resourceKeys, options: options) else { return [] }
+    public static func packages(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles], typeIdentifier: String? = nil) throws -> [Package] {
+        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
         var packages: [Package] = []
+        var lastUrl: URL?
+        
+        guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: resourceKeys, options: options) else { return [] }
         
         for case let fileURL as URL in enumerator {
             do {
                 let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
-                guard resourceValues.isPackage ?? false else { continue }
+                
+                if let typeIdentifier = typeIdentifier {
+                    print(resourceValues.typeIdentifier!)
+                    guard resourceValues.typeIdentifier == typeIdentifier.lowercased() else { continue }
+                } else {
+                    guard !(lastUrl?.isParent(of: fileURL) ?? false) else { continue }
+                    lastUrl = fileURL
+                }
+                
                 guard let package = try package(at: fileURL) else { continue }
                 packages.append(package)
             } catch let error {
@@ -130,8 +141,11 @@ public class PackagableDisk {
      */
     public static func package(at url: URL) throws -> Package? {
         let fileWrapper: FileWrapper
+        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
+        let resourceValues: URLResourceValues
         
         do {
+            resourceValues = try url.resourceValues(forKeys: Set(resourceKeys))
             fileWrapper = try FileWrapper(url: url, options: [.immediate])
         } catch let error {
             throw PackageDecodingError.unableToDecodeFile(cause: error)
@@ -141,6 +155,6 @@ public class PackagableDisk {
             throw PackageDecodingError.notFolder
         }
         
-        return try Package(fileWrapper, savedUrl: url)
+        return try Package(fileWrapper, savedUrl: url, typeIdentifier: resourceValues.typeIdentifier)
     }
 }
