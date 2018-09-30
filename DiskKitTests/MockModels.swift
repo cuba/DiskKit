@@ -47,7 +47,7 @@ extension MockDiskCodable: Equatable {
     }
 }
 
-struct MockPackage: Packagable {
+struct MockPackage: Package {
     static let typeIdentifier = "com.jacobsikorski.diskkit.example.package"
     
     var codable: MockCodable
@@ -72,18 +72,18 @@ struct MockPackage: Packagable {
         ]
     }
     
-    init(package: Package) throws {
-        self.codable = try package.file("codable.json")
-        self.diskCodable = try package.file("disk_codable.json")
-        self.codableArray = try package.fileArray("codable_list")
-        self.diskCodableArray = try package.fileArray("disk_codable_list")
+    init(directory: Directory) throws {
+        self.codable = try directory.file("codable.json")
+        self.diskCodable = try directory.file("disk_codable.json")
+        self.codableArray = try directory.fileArray("codable_list")
+        self.diskCodableArray = try directory.fileArray("disk_codable_list")
     }
     
-    func fill(package: Package) throws {
-        try package.add(codable, name: "codable.json")
-        try package.add(diskCodable, name: "disk_codable.json")
-        try package.add(codableArray, name: "codable_list")
-        try package.add(diskCodableArray, name: "disk_codable_list")
+    func fill(directory: Directory) throws {
+        try directory.add(codable, name: "codable.json")
+        try directory.add(diskCodable, name: "disk_codable.json")
+        try directory.add(codableArray, name: "codable_list")
+        try directory.add(diskCodableArray, name: "disk_codable_list")
     }
 }
 

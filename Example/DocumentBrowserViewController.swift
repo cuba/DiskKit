@@ -28,7 +28,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     // MARK: UIDocumentBrowserViewControllerDelegate
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didRequestDocumentCreationWithHandler importHandler: @escaping (URL?, UIDocumentBrowserViewController.ImportMode) -> Void) {
-        let filename = "\(UUID().uuidString).package"
+        let filename = "\(UUID().uuidString).directory"
         let url = Disk.Directory.documents.makeUrl(filename: filename)
         let article = Article()
         

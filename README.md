@@ -126,34 +126,30 @@ do {
 
 ### Document Packages
 
-You may also store [Document Packages](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).  You just need to implement the Package protocol:
+You may also store [Document Packages](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).  You just need to implement the Directory protocol:
 
-Packages also support nested packages which need to extend the `Package` protocol.
+Packages also support nested packages which need to extend the `Directory` protocol.
 
 ```swift
-struct TestPackage: Packagable {
+struct TestPackage: Package {
     static let typeIdentifier = "com.example.myproject.myfileidentifier"
     
     var codable: TestCodable
     var diskCodable: TestDiskCodable
-    var subPackage: AnotherTestPackage
     
-    init(codable: TestCodable, diskCodable: TestDiskCodable, subPackage: AnotherTestPackage) {
+    init(codable: TestCodable, diskCodable: TestDiskCodable) {
         self.codable = codable
         self.diskCodable = diskCodable
-        self.subPackage = subPackage
     }
     
-    init(package: Package) throws {
+    init(directory: Directory) throws {
         self.codable = try map.file("codable.json")
         self.diskCodable = try map.file("disk_codable.json")
-        self.subPackage = try.map.file("sub_package")
     }
     
-    func fill(package: Package) throws {
+    func fill(directory: Directory) throws {
         try map.add(codable, name: "codable.json")
         try map.add(diskCodable, name: "disk_codable.json")
-        try map.add(subPackage, name: "sub_package")
     }
 }
 ```
@@ -180,23 +176,24 @@ do {
 ```swift
 
 do {
-    let url = Disk.Directory.documents.
-    let package: TestPackage = try PackagableDisk.packagable(in .documents, withName: filename)
+    let url = Disk.Directory.documents.baseUrl
+    let directory: TestPackage = try PackagableDisk.package(in .documents, withName: filename)
 } catch {
     // Handle error
 }
 ```
 
 **Note:**
-You need provide additional information about your package type (and extension) in your applications Info.plist file.
+You need provide additional information about your directory type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
-Without this additional information, your package will not be found.
+Without this additional information, your directory will not be found.
 
 #### PackagableDisk supported types
 
-Packagable supports the following types:
+Package supports the following types:
 * `Directory` class
+* `Directory` array
 * `Codable` types
 * `Codable` arrays (i.e. `[T] where T: Codable`) *These will be stored in auto-generated file names*
 * `DiskCodable` types

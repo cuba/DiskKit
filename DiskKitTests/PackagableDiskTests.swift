@@ -23,7 +23,7 @@ class PackagableDiskTests: XCTestCase {
     
     func testGivenPackagableFile_WhenSaveFile_ThenFileLoadReturnsOriginalFile() {
         // Given
-        let filename = "example.package"
+        let filename = "example.directory"
         let testFile = MockPackage(id: "ABC")
         
         // When
@@ -32,7 +32,7 @@ class PackagableDiskTests: XCTestCase {
         
         // Then
         do {
-            guard let loadedFile: MockPackage = try PackagableDisk.packagable(withName: filename, in: .documents, path: "some_folder") else {
+            guard let loadedFile: MockPackage = try PackagableDisk.package(withName: filename, in: .documents, path: "some_folder") else {
                 XCTAssert(false)
                 return
             }
@@ -58,7 +58,7 @@ class PackagableDiskTests: XCTestCase {
 
         // Then
         do {
-            let loadedFiles: [MockPackage] = try PackagableDisk.packagables(in: .documents, path: "some_folder")
+            let loadedFiles: [MockPackage] = try PackagableDisk.packages(in: .documents, path: "some_folder")
             
             guard loadedFiles.count == 2 else {
                 XCTAssert(false)
@@ -86,7 +86,7 @@ class PackagableDiskTests: XCTestCase {
         
         // Then
         do {
-            let loadedFiles: [MockPackage] = try PackagableDisk.packagables(in: .documents, path: "some_folder", typeIdentifier: "com.jacobsikorski.DiskKit.Example.package")
+            let loadedFiles: [MockPackage] = try PackagableDisk.packages(in: .documents, path: "some_folder")
             
             guard loadedFiles.count == 1 else {
                 XCTAssert(false)
@@ -101,7 +101,7 @@ class PackagableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
-        let filename = "example.package"
+        let filename = "example.directory"
         let testFile = MockPackage(id: "ABC")
         
         // When
@@ -114,7 +114,7 @@ class PackagableDiskTests: XCTestCase {
     
     func testGivenCodableFile_WhenSaveFile_CanOverwriteFile() {
         // Given
-        let filename = "example.package"
+        let filename = "example.directory"
         var testFile = MockPackage(id: "ABC")
         
         // When

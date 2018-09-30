@@ -1,5 +1,5 @@
 //
-//  Package.swift
+//  Directory.swift
 //  DiskKit
 //
 //  Created by Jacob Sikorski on 2018-09-15.
@@ -21,20 +21,24 @@ public enum PackageDecodingError: Error {
 }
 
 public class Directory {
-    private(set) public var name: String
+    public let name: String
+    public let saveUrl: URL
+    public let typeIdentifier: String?
     private(set) public var files: [File] = []
     private(set) public var directories: [Directory] = []
     
-    init(name: String) {
+    init(name: String, saveUrl: URL, typeIdentifier: String?) {
         self.name = name
+        self.saveUrl = saveUrl
+        self.typeIdentifier = typeIdentifier
     }
     
-    init(_ fileWrapper: FileWrapper) throws {
-        self.name = fileWrapper.filename!
+    convenience init(_ fileWrapper: FileWrapper, saveUrl: URL, typeIdentifier: String?) {
+        self.init(name: fileWrapper.filename!, saveUrl: saveUrl, typeIdentifier: typeIdentifier)
         
         for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
             if subFileWrapper.isDirectory {
-                let directory = try Directory(subFileWrapper)
+                let directory = Directory(subFileWrapper, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
                 directories.append(directory)
             } else {
                 guard let data = subFileWrapper.regularFileContents else { continue }
@@ -103,7 +107,7 @@ public class Directory {
     }
     
     public func add<T: DiskEncodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -113,7 +117,7 @@ public class Directory {
     }
     
     public func add<T: Encodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -123,7 +127,7 @@ public class Directory {
     }
     
     public func add(_ filesArray: [File], name: String) throws {
-        let directory = Directory(name: name)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
         
         for (_, file) in filesArray.enumerated() {
             directory.add(file)
@@ -303,27 +307,5 @@ public class Directory {
         }
         
         return FileWrapper(directoryWithFileWrappers: fileWrappers)
-    }
-}
-
-public class Package: Directory  {
-    public let typeIdentifier: String?
-    public let savedUrl: URL
-    
-    public var filename: String {
-        return name
-    }
-    
-    init(filename: String, savedUrl: URL, typeIdentifier: String?) {
-        self.typeIdentifier = typeIdentifier
-        self.savedUrl = savedUrl
-        super.init(name: filename)
-    }
-    
-    init(_ fileWrapper: FileWrapper, savedUrl: URL, typeIdentifier: String?) throws {
-        self.savedUrl = savedUrl
-        self.typeIdentifier = typeIdentifier
-        
-        try super.init(fileWrapper)
     }
 }

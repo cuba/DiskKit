@@ -1,5 +1,5 @@
 //
-//  Packagable.swift
+//  Package.swift
 //  DiskKit
 //
 //  Created by Jacob Sikorski on 2018-09-16.
@@ -8,17 +8,17 @@
 
 import Foundation
 
-public protocol Packagable {
+public protocol Package {
     static var typeIdentifier: String { get }
-    init(package: Package) throws
-    func fill(package: Package) throws
+    init(directory: Directory) throws
+    func fill(directory: Directory) throws
 }
 
-public extension Packagable {
+public extension Package {
     
     public func makeFileWrapper(saveUrl: URL) throws -> FileWrapper {
-        let package = Package(filename: saveUrl.lastPathComponent, savedUrl: saveUrl, typeIdentifier: type(of: self).typeIdentifier)
-        try fill(package: package)
-        return try package.makeFileWrapper()
+        let directory = Directory(name: saveUrl.lastPathComponent, saveUrl: saveUrl, typeIdentifier: type(of: self).typeIdentifier)
+        try fill(directory: directory)
+        return try directory.makeFileWrapper()
     }
 }

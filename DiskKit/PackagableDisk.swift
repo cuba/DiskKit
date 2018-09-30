@@ -11,103 +11,107 @@ import Foundation
 public class PackagableDisk {
     
     /**
-     * Store an package to the specified directory on disk
-     * @package: the package to store
-     * @to: the directory where to store the package
-     * @as: the name to store the package as
+     * Store an directory to the specified directory on disk
+     * @directory: the directory to store
+     * @to: the directory where to store the directory
+     * @as: the name to store the directory as
      * @path: the path in the directory to store the file in. The filename will be appended to this path.
-     * @originalUrl: the original url of the package.
+     * @originalUrl: the original url of the directory.
      */
-    public static func store(_ package: Packagable, to directory: Disk.Directory, as filename: String, path: String? = nil, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws -> URL {
+    public static func store(_ package: Package, to directory: Disk.Directory, as filename: String, path: String? = nil, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws -> URL {
         let url = directory.makeUrl(path: path, filename: filename)
-        try store(package, to: url, originalUrl: originalUrl)
+        try store(package, to: url, options: options, originalUrl: originalUrl)
         return url
     }
     
     /**
      * Retrieve and convert a packages from a folder on disk
-     * @packageName: name of the package where folder is stored
-     * @directory: directory where package data is stored
-     * @Returns: decoded package
+     * @packageName: name of the directory where folder is stored
+     * @directory: directory where directory data is stored
+     * @Returns: decoded directory
      */
-    public static func packagables<T: Packagable>(in directory: Disk.Directory, path: String? = nil, typeIdentifier: String? = nil) throws -> [T] {
+    public static func packages<T: Package>(in directory: Disk.Directory, path: String? = nil, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants]) throws -> [T] {
         let url = directory.makeUrl(path: path)
-        return try packagables(in: url)
+        return try packages(in: url, options: options)
     }
     
     /**
-     * Retrieve and convert a package from a folder on disk
-     * @packageName: name of the package where folder is stored
-     * @directory: directory where package data is stored
-     * @Returns: decoded package
+     * Retrieve and convert a directory from a folder on disk
+     * @packageName: name of the directory where folder is stored
+     * @directory: directory where directory data is stored
+     * @Returns: decoded directory
      */
-    public static func packagable<T: Packagable>(withName packageName: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
-        let url = directory.makeUrl(paths: [path, packageName].compactMap({ $0 }))
-        return try packagable(at: url)
+    public static func package<T: Package>(withName name: String, in directory: Disk.Directory, path: String? = nil) throws -> T? {
+        let url = directory.makeUrl(paths: [path, name].compactMap({ $0 }))
+        return try package(at: url)
     }
     
     /**
-     * Store an package to the specified directory on disk
-     * @package: the package to store
+     * Store an directory to the specified directory on disk
+     * @directory: the directory to store
      * @url: where to store the struct
-     * @orignalUrl: the original location of the package (you should provide this if you're updating an existing package)
+     * @orignalUrl: the original location of the directory (you should provide this if you're updating an existing directory)
      */
-    public static func store(_ package: Packagable, to url: URL, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws {
+    public static func store(_ package: Package, to url: URL, options: FileWrapper.WritingOptions = [.withNameUpdating, .atomic], originalUrl: URL? = nil) throws {
         let fileWrapper = try package.makeFileWrapper(saveUrl: url)
         try fileWrapper.write(to: url, options: options, originalContentsURL: originalUrl)
         
         #if DEBUG
         if originalUrl != nil {
-            print("Updated package in \(url)")
+            print("Updated directory in \(url)")
         } else {
-            print("Saved package to \(url)")
+            print("Saved directory to \(url)")
         }
         #endif
     }
     
     /**
-     * Retrieve and convert a packagables from a folder on disk
-     * @url: url where package data is stored
-     * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
-     * @typeIdentifier: The identifier of the file defined in the Info.plist file under UTTypeIdentifier
-     * @Returns: decoded package
+     * Retrieve and convert a packagabe from a folder on disk
+     * @url: url where directory data is stored
+     * @Returns: decoded directory
      */
-    public static func packagables<T: Packagable>(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles]) throws -> [T] {
-        var packagables: [T] = []
+    public static func package<T: Package>(at url: URL) throws -> T? {
+        guard let directory = try directory(at: url) else { return nil }
+        return try T(directory: directory)
+    }
+    
+    /**
+     * Retrieve and convert a directory from a folder on disk
+     * @url: url where directory is stored
+     * @options: Default value is [.skipsPackageDescendants]
+     * @Returns: A list of packages
+     */
+    public static func packages<T: Package>(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants]) throws -> [T] {
+        let directories = self.directories(in: url, options: options, typeIdentifier: T.typeIdentifier)
+        var packages: [T] = []
         
-        for package in try packages(in: url, options: options, typeIdentifier: T.typeIdentifier) {
+        for directory in directories {
             do {
-                let packagable = try T(package: package)
-                packagables.append(packagable)
+                let package = try T(directory: directory)
+                packages.append(package)
             } catch let error {
                 print(error)
-                // TODO: Handle this?
             }
         }
         
-        return packagables
+        return packages
     }
     
     /**
-     * Retrieve and convert a packagabe from a folder on disk
-     * @url: url where package data is stored
-     * @Returns: decoded package
+     * Retrieve and convert a directory from a folder on disk
+     * @url: url where directory is stored
+     * @options: Directory enumeration options
+     * @typeIdentifier: The identifier of the file defined in the Info.plist file under UTTypeIdentifier
+     * @Returns: A directory
      */
-    public static func packagable<T: Packagable>(at url: URL) throws -> T? {
-        guard let package = try package(at: url) else { return nil }
-        return try T(package: package)
-    }
-    
-    /**
-     * Retrieve and convert a packages from a folder on disk
-     * @url: url where package data is stored
-     * @options: Default value is [.skipsPackageDescendants, .skipsHiddenFiles]
-     * @Returns: decoded package
-     */
-    public static func packages(in url: URL, options: FileManager.DirectoryEnumerationOptions = [.skipsPackageDescendants, .skipsHiddenFiles], typeIdentifier: String? = nil) throws -> [Package] {
-        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
-        var packages: [Package] = []
+    public static func directories(in url: URL, options: FileManager.DirectoryEnumerationOptions = [], typeIdentifier: String? = nil) -> [Directory] {
+        var resourceKeys: [URLResourceKey] = []
+        var directories: [Directory] = []
         var lastUrl: URL?
+        
+        if typeIdentifier != nil {
+            resourceKeys.append(.typeIdentifierKey)
+        }
         
         guard let enumerator = FileManager.default.enumerator(at: url, includingPropertiesForKeys: resourceKeys, options: options) else { return [] }
         
@@ -116,30 +120,29 @@ public class PackagableDisk {
                 let resourceValues = try fileURL.resourceValues(forKeys: Set(resourceKeys))
                 
                 if let typeIdentifier = typeIdentifier {
-                    print(resourceValues.typeIdentifier!)
                     guard resourceValues.typeIdentifier == typeIdentifier.lowercased() else { continue }
                 } else {
                     guard !(lastUrl?.isParent(of: fileURL) ?? false) else { continue }
                     lastUrl = fileURL
                 }
                 
-                guard let package = try package(at: fileURL) else { continue }
-                packages.append(package)
+                guard let directory = try self.directory(at: fileURL) else { continue }
+                directories.append(directory)
             } catch let error {
                 print(error)
                 // TODO: Handle this?
             }
         }
         
-        return packages
+        return directories
     }
     
     /**
-     * Retrieve and convert a package from a folder on disk
-     * @url: url where package data is stored
-     * @Returns: decoded package
+     * Retrieve and convert a directory from a folder on disk
+     * @url: url where directory data is stored
+     * @Returns: decoded directory
      */
-    public static func package(at url: URL) throws -> Package? {
+    public static func directory(at url: URL) throws -> Directory? {
         let fileWrapper: FileWrapper
         let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
         let resourceValues: URLResourceValues
@@ -155,6 +158,6 @@ public class PackagableDisk {
             throw PackageDecodingError.notFolder
         }
         
-        return try Package(fileWrapper, savedUrl: url, typeIdentifier: resourceValues.typeIdentifier)
+        return Directory(fileWrapper, saveUrl: url, typeIdentifier: resourceValues.typeIdentifier)
     }
 }

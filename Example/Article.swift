@@ -9,7 +9,7 @@
 import Foundation
 import DiskKit
 
-struct Article: Packagable {
+struct Article: Package {
     static let typeIdentifier: String = "com.jacobsikorski.diskkit.example.package"
     static let baseUrl = Disk.Directory.documents.makeUrl()
     
@@ -21,14 +21,14 @@ struct Article: Packagable {
         self.author = Author(name: "John Doe")
     }
     
-    init(package: Package) throws {
-        details = try package.file("article.json")
-        author = try package.file("author.json")
+    init(directory: Directory) throws {
+        details = try directory.file("article.json")
+        author = try directory.file("author.json")
     }
     
-    func fill(package: Package) throws {
-        try package.add(details, name: "article.json")
-        try package.add(author, name: "author.json")
+    func fill(directory: Directory) throws {
+        try directory.add(details, name: "article.json")
+        try directory.add(author, name: "author.json")
     }
     
     func save(to url: URL, from originalUrl: URL?) throws {
@@ -36,11 +36,11 @@ struct Article: Packagable {
     }
     
     static func load(from url: URL) throws -> Article? {
-        return try PackagableDisk.packagable(at: url)
+        return try PackagableDisk.package(at: url)
     }
     
     static func loadAll(from url: URL) throws -> [Article] {
-        return try PackagableDisk.packagables(in: url)
+        return try PackagableDisk.packages(in: url)
     }
 }
 
