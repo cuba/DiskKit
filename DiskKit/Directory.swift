@@ -263,28 +263,6 @@ public class Directory {
         return try directory.fileArray()
     }
     
-    // MARK: - Get Image
-    
-    public func image(_ name: String) throws -> UIImage {
-        let file: File = try self.file(name)
-        
-        guard let image = file.image() else {
-            throw PackageDecodingError.unableToDecodeFile(cause: nil)
-        }
-        
-        return image
-    }
-    
-    public func image(_ name: String) throws -> UIImage? {
-        guard let file = files.first(where: { $0.filename == name }) else { return nil }
-        
-        guard let image = file.image() else {
-            throw PackageDecodingError.unableToDecodeFile(cause: nil)
-        }
-        
-        return image
-    }
-    
     // MARK: - Get Package
     
     public func package<T: Package>(_ name: String) throws -> T {
@@ -307,6 +285,28 @@ public class Directory {
         }
         
         return directory
+    }
+    
+    // MARK: - Get Image
+    
+    public func image(_ name: String) throws -> UIImage {
+        let file: File = try self.file(name)
+        
+        guard let image = file.image() else {
+            throw PackageDecodingError.unableToDecodeFile(cause: nil)
+        }
+        
+        return image
+    }
+    
+    public func image(_ name: String) throws -> UIImage? {
+        guard let file = files.first(where: { $0.filename == name }) else { return nil }
+        
+        guard let image = file.image() else {
+            throw PackageDecodingError.unableToDecodeFile(cause: nil)
+        }
+        
+        return image
     }
     
     // MARK: - Get Text
