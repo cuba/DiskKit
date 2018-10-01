@@ -17,28 +17,38 @@ public enum PackageDecodingError: Error {
     case fileNotFound
     case directoryNotFound
     case notFolder
+    case invalidType
     case unableToDecodeFile(cause: Error?)
 }
 
 public class Directory {
     public let name: String
     public let saveUrl: URL
-    public let typeIdentifier: String?
-    private(set) public var files: [File] = []
-    private(set) public var directories: [Directory] = []
+    public let typeIdentifier: String
+    private var files: [File] = []
+    private var directories: [Directory] = []
     
-    init(name: String, saveUrl: URL, typeIdentifier: String?) {
+    init(name: String, saveUrl: URL, typeIdentifier: String = "public.folder") {
         self.name = name
         self.saveUrl = saveUrl
         self.typeIdentifier = typeIdentifier
     }
     
-    convenience init(_ fileWrapper: FileWrapper, saveUrl: URL, typeIdentifier: String?) {
-        self.init(name: fileWrapper.filename!, saveUrl: saveUrl, typeIdentifier: typeIdentifier)
+    convenience init(_ fileWrapper: FileWrapper, saveUrl: URL) {
+        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
+        var resourceValues: URLResourceValues?
+        
+        do {
+            resourceValues = try saveUrl.resourceValues(forKeys: Set(resourceKeys))
+        } catch {
+            // Handle this?
+        }
+        
+        self.init(name: fileWrapper.filename!, saveUrl: saveUrl, typeIdentifier: resourceValues?.typeIdentifier ?? "public.folder")
         
         for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
             if subFileWrapper.isDirectory {
-                let directory = Directory(subFileWrapper, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
+                let directory = Directory(subFileWrapper, saveUrl: saveUrl.appendingPathComponent(name))
                 directories.append(directory)
             } else {
                 guard let data = subFileWrapper.regularFileContents else { continue }
@@ -107,7 +117,7 @@ public class Directory {
     }
     
     public func add<T: DiskEncodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -117,7 +127,7 @@ public class Directory {
     }
     
     public func add<T: Encodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -127,7 +137,7 @@ public class Directory {
     }
     
     public func add(_ filesArray: [File], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: nil)
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
         
         for (_, file) in filesArray.enumerated() {
             directory.add(file)
@@ -138,6 +148,12 @@ public class Directory {
     
     public func add(_ directory: Directory, name: String) {
         directories.append(directory)
+    }
+    
+    public func add<T: Package>(_ package: T, name: String) throws {
+        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: T.typeIdentifier)
+        try package.fill(directory: directory)
+        add(directory, name: name)
     }
     
     // MARK: - Get Data
@@ -263,11 +279,29 @@ public class Directory {
         return image
     }
     
-    // MARK: - Get Directory
+    // MARK: - Get Package
     
-    public func directory(_ name: String) throws -> Directory {
+    public func package<T: Package>(_ name: String) throws -> T {
         guard let directory = directories.first(where: { $0.name == name }) else {
             throw PackageDecodingError.directoryNotFound
+        }
+        
+        guard directory.typeIdentifier == T.typeIdentifier else {
+            throw PackageDecodingError.invalidType
+        }
+        
+        return try T(directory: directory)
+    }
+    
+    // MARK: - Get Directory
+    
+    public func directory(_ name: String, typeIdentifier: String? = nil) throws -> Directory {
+        guard let directory = directories.first(where: { $0.name == name }) else {
+            throw PackageDecodingError.directoryNotFound
+        }
+    
+        guard typeIdentifier == nil || directory.typeIdentifier == typeIdentifier else {
+            throw PackageDecodingError.invalidType
         }
         
         return directory

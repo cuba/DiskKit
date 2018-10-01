@@ -71,7 +71,7 @@ public class PackagableDisk {
      * @Returns: decoded directory
      */
     public static func package<T: Package>(at url: URL) throws -> T? {
-        guard let directory = try directory(at: url) else { return nil }
+        let directory = try self.directory(at: url)
         return try T(directory: directory)
     }
     
@@ -126,7 +126,7 @@ public class PackagableDisk {
                     lastUrl = fileURL
                 }
                 
-                guard let directory = try self.directory(at: fileURL) else { continue }
+                let directory = try self.directory(at: fileURL)
                 directories.append(directory)
             } catch let error {
                 print(error)
@@ -142,13 +142,10 @@ public class PackagableDisk {
      * @url: url where directory data is stored
      * @Returns: decoded directory
      */
-    public static func directory(at url: URL) throws -> Directory? {
+    public static func directory(at url: URL) throws -> Directory {
         let fileWrapper: FileWrapper
-        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
-        let resourceValues: URLResourceValues
         
         do {
-            resourceValues = try url.resourceValues(forKeys: Set(resourceKeys))
             fileWrapper = try FileWrapper(url: url, options: [.immediate])
         } catch let error {
             throw PackageDecodingError.unableToDecodeFile(cause: error)
@@ -158,6 +155,6 @@ public class PackagableDisk {
             throw PackageDecodingError.notFolder
         }
         
-        return Directory(fileWrapper, saveUrl: url, typeIdentifier: resourceValues.typeIdentifier)
+        return Directory(fileWrapper, saveUrl: url)
     }
 }

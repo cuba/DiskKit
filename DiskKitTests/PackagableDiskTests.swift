@@ -99,6 +99,38 @@ class PackagableDiskTests: XCTestCase {
         }
     }
     
+    func testGivenDifferentStoredFiles_WhenQueingDirectories_ThenFilesAreReturnedCorrectly() {
+        // Given
+        let testFiles = [
+            MockPackage(id: "ABC"),
+            MockPackage(id: "123")
+        ]
+        
+        // When
+        XCTAssertNoThrow(try Disk.create(path: "some_folder/sub_folder", in: .documents))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[0], to: .documents, as: "other_package", path: "some_folder"))
+        XCTAssertNoThrow(try PackagableDisk.store(testFiles[1], to: .documents, as: "example_1.package", path: "some_folder/sub_folder"))
+        
+        // Then
+        do {
+            let url = Disk.Directory.documents.makeUrl(path: "some_folder")
+            let loadedDirectory = try PackagableDisk.directory(at: url)
+            let packageDirectory = try loadedDirectory.directory("sub_folder")
+            let otherDirectory = try loadedDirectory.directory("other_package")
+            let codableListDirectory = try otherDirectory.directory("codable_list")
+            let diskCodableListDirectory = try otherDirectory.directory("disk_codable_list")
+            let codable: MockCodable = try codableListDirectory.file("file_2")
+            let diskCodable: MockDiskCodable = try diskCodableListDirectory.file("file_2")
+            let package: MockPackage = try packageDirectory.package("example_1.package")
+            
+            XCTAssertNotNil(package)
+            XCTAssertNotNil(codable)
+            XCTAssertNotNil(diskCodable)
+        } catch {
+            XCTAssert(false)
+        }
+    }
+    
     func testGivenCodableFile_WhenSaveFile_ThenFileExistsReturnsTrue() {
         // Given
         let filename = "example.directory"

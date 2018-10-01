@@ -132,7 +132,7 @@ Packages also support nested packages which need to extend the `Directory` proto
 
 ```swift
 struct TestPackage: Package {
-    static let typeIdentifier = "com.example.myproject.myfileidentifier"
+    static let typeIdentifier = "com.example.myproject.package"
     
     var codable: TestCodable
     var diskCodable: TestDiskCodable
@@ -184,16 +184,24 @@ do {
 ```
 
 **Note:**
-You need provide additional information about your directory type (and extension) in your applications Info.plist file.
+You need to provide additional information about your directory type (and extension) in your applications Info.plist file.
 You can get more information about Document Packages [here](https://developer.apple.com/library/archive/documentation/CoreFoundation/Conceptual/CFBundles/DocumentPackages/DocumentPackages.html).
 
 Without this additional information, your directory will not be found.
 
-#### PackagableDisk supported types
 
-Package supports the following types:
+### Directories
+
+You can query entire directories with all of its contents
+
+```swift
+
+```
+
+#### Directory supported types
+
+Directory supports the following types:
 * `Directory` class
-* `Directory` array
 * `Codable` types
 * `Codable` arrays (i.e. `[T] where T: Codable`) *These will be stored in auto-generated file names*
 * `DiskCodable` types
