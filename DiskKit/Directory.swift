@@ -23,28 +23,34 @@ public enum PackageDecodingError: Error {
 
 public class Directory {
     public let name: String
-    public let saveUrl: URL
-    public let typeIdentifier: String
+    public let saveUrl: URL?
     private var files: [File] = []
     private var directories: [Directory] = []
     
-    init(name: String, saveUrl: URL, typeIdentifier: String = "public.folder") {
+    private var typeIdentifier: String? {
+        guard let saveUrl = self.saveUrl else { return nil }
+        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
+        
+        do {
+            let resourceValues = try saveUrl.resourceValues(forKeys: Set(resourceKeys))
+            return resourceValues.typeIdentifier
+        } catch {
+            return nil
+        }
+    }
+    
+    public init(name: String) {
+        self.name = name
+        self.saveUrl = nil
+    }
+    
+    init(name: String, saveUrl: URL? = nil) {
         self.name = name
         self.saveUrl = saveUrl
-        self.typeIdentifier = typeIdentifier
     }
     
     convenience init(_ fileWrapper: FileWrapper, saveUrl: URL) {
-        let resourceKeys: [URLResourceKey] = [.typeIdentifierKey]
-        var resourceValues: URLResourceValues?
-        
-        do {
-            resourceValues = try saveUrl.resourceValues(forKeys: Set(resourceKeys))
-        } catch {
-            // Handle this?
-        }
-        
-        self.init(name: fileWrapper.filename!, saveUrl: saveUrl, typeIdentifier: resourceValues?.typeIdentifier ?? "public.folder")
+        self.init(name: fileWrapper.filename!, saveUrl: saveUrl)
         
         for (name, subFileWrapper) in fileWrapper.fileWrappers ?? [:] {
             if subFileWrapper.isDirectory {
@@ -117,7 +123,7 @@ public class Directory {
     }
     
     public func add<T: DiskEncodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
+        let directory = Directory(name: name, saveUrl: nil)
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -127,7 +133,7 @@ public class Directory {
     }
     
     public func add<T: Encodable>(_ fileArray: [T], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
+        let directory = Directory(name: name, saveUrl: nil)
         
         for (index, file) in fileArray.enumerated() {
             try directory.add(file, name: "file_\(index)")
@@ -137,7 +143,7 @@ public class Directory {
     }
     
     public func add(_ filesArray: [File], name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: "public.folder")
+        let directory = Directory(name: name, saveUrl: nil)
         
         for (_, file) in filesArray.enumerated() {
             directory.add(file)
@@ -146,14 +152,14 @@ public class Directory {
         directories.append(directory)
     }
     
-    public func add(_ directory: Directory, name: String) {
+    public func add(_ directory: Directory) {
         directories.append(directory)
     }
     
     public func add<T: Package>(_ package: T, name: String) throws {
-        let directory = Directory(name: name, saveUrl: saveUrl.appendingPathComponent(name), typeIdentifier: T.typeIdentifier)
+        let directory = Directory(name: name)
         try package.fill(directory: directory)
-        add(directory, name: name)
+        add(directory)
     }
     
     // MARK: - Get Data
@@ -284,10 +290,6 @@ public class Directory {
     public func package<T: Package>(_ name: String) throws -> T {
         guard let directory = directories.first(where: { $0.name == name }) else {
             throw PackageDecodingError.directoryNotFound
-        }
-        
-        guard directory.typeIdentifier == T.typeIdentifier else {
-            throw PackageDecodingError.invalidType
         }
         
         return try T(directory: directory)

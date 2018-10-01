@@ -17,7 +17,7 @@ public protocol Package {
 public extension Package {
     
     public func makeFileWrapper(saveUrl: URL) throws -> FileWrapper {
-        let directory = Directory(name: saveUrl.lastPathComponent, saveUrl: saveUrl, typeIdentifier: type(of: self).typeIdentifier)
+        let directory = Directory(name: saveUrl.lastPathComponent, saveUrl: saveUrl)
         try fill(directory: directory)
         return try directory.makeFileWrapper()
     }
