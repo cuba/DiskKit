@@ -37,7 +37,7 @@ public class Migrator {
     }
     
     public func resetMigration(withName name: String) {
-        while let index = migrations.index(of: name) {
+        while let index = migrations.firstIndex(of: name) {
             migrations.remove(at: index)
         }
         

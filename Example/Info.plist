@@ -77,7 +77,7 @@
 				<string>com.apple.package</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Safety Boot File</string>
+			<string>Example Package</string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
@@ -86,7 +86,7 @@
 			<dict>
 				<key>public.filename-extension</key>
 				<array>
-					<string>package</string>
+					<string>example</string>
 				</array>
 			</dict>
 		</dict>

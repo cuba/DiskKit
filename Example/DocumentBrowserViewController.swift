@@ -28,7 +28,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     // MARK: UIDocumentBrowserViewControllerDelegate
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, didRequestDocumentCreationWithHandler importHandler: @escaping (URL?, UIDocumentBrowserViewController.ImportMode) -> Void) {
-        let filename = "\(UUID().uuidString).directory"
+        let filename = "\(UUID().uuidString).example"
         let url = Disk.Directory.documents.makeUrl(filename: filename)
         let article = Article()
         
@@ -54,6 +54,7 @@ class DocumentBrowserViewController: UIDocumentBrowserViewController, UIDocument
     }
     
     func documentBrowser(_ controller: UIDocumentBrowserViewController, failedToImportDocumentAt documentURL: URL, error: Error?) {
+        print(error)
         // Make sure to handle the failed import appropriately, e.g., by presenting an error message to the user.
     }
     

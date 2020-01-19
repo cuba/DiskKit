@@ -71,7 +71,7 @@ public class Directory {
     }
     
     public func add(_ file: File) {
-        if let index = files.index(of: file) {
+        if let index = files.firstIndex(of: file) {
             files[index] = file
         } else {
             files.append(file)
